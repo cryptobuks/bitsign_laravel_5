@@ -20,7 +20,7 @@
                     <li class="active nav-item sr-only"><a class="scrollto" href="/">Home</a></li>
                     <li class="nav-item"><a class="scrollto" href="#features">Features</a></li>
                     <li class="nav-item"><a class="scrollto" href="#faq">FAQ</a></li>
-                    <li class="nav-item"><a href="/login">Login</a></li>
+                    <li class="nav-item"><a href="/auth/login">Login</a></li>
                 </ul><!--//nav-->
             </div><!--//navabr-collapse-->
         </nav><!--//main-nav-->
