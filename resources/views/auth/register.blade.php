@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('welcome.master')
 
 @section('content')
 
@@ -15,45 +15,45 @@
 	    	@endforeach
 	    	</div>
 	    	@endif
-		      	{{ Form::open(array('route' => 'auth.register')) }}
+		      	{!! Form::open(array('url' => 'auth/register')) !!}
 		      			<div class="form-group">
-			      			{{Form::label('f_name','First Name:')}}
+			      			{!! Form::label('f_name','First Name:') !!}
 			      			<br>
-			      			{{Form::text('f_name')}}
+			      			{!! Form::text('f_name') !!}
 		      			</div>
 		      			<div class="form-group">
-			      			{{Form::label('l_name','Last Name:')}}
+			      			{!! Form::label('l_name','Last Name:') !!}
 			      			<br>
-			      			{{Form::text('l_name')}}
+			      			{!! Form::text('l_name') !!}
 		      			</div>
 		      			<div class="form-group">
-			      			{{Form::label('name','Username:')}}
+			      			{!! Form::label('name','Username:') !!}
 			      			<br>
-			      			{{Form::text('name')}}
+			      			{!! Form::text('name') !!}
 		      			</div>
 		      			<div class="form-group">
-			      			{{Form::label('email','Email:')}}
+			      			{!! Form::label('email','Email:') !!}
 			      			<br>
-			      			{{Form::text('email')}}
+			      			{!! Form::text('email') !!}
 		      			</div>
 		      			<div class="form-group">
-			      			{{Form::label('password','Password:')}}
+			      			{!! Form::label('password','Password:') !!}
 			      			<br>
-			      			{{Form::password('password')}}
+			      			{!! Form::password('password') !!}
 			      		</div>
 			      		<div class="form-group">
-			      			{{Form::label('password_confirmation','Retype Password:')}}
+			      			{!! Form::label('password_confirmation','Retype Password:') !!}
 			      			<br>
-			      			{{Form::password('password_confirmation')}}
+			      			{!! Form::password('password_confirmation') !!}
 			      		</div>
 			      		<div class="form-group">
-			      			{{Form::label('agree','I agree to the Terms of Use:')}}
-			      			{{ Form::checkbox('agree') }}
+			      			{!! Form::label('agree','I agree to the Terms of Use:') !!}
+			      			{!!  Form::checkbox('agree')  !!}
 			      		</div>
 			      		<div class="form-group">
-			      			{{Form::submit('Sign Up', array('class'=>'btn btn-cta-secondary'))}}
+			      			{!! Form::submit('Sign Up', array('class'=>'btn btn-cta-secondary')) !!}
 			      		</div>
-				{{ Form::close() }}
+				{!! Form::close() !!}
 			</center>
 		</div>
 	</div>

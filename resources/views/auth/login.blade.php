@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('welcome.master')
 
 @section('content')
 
@@ -14,19 +14,17 @@
 			    	Incorrect username/password combination
 			    	</div>
 			    	@endif
-				      	{{ Form::open(array('route' => 'auth.login')) }}
+				      	{!!  Form::open(array('url' => 'auth/login'))  !!}
 				      			<div class="form-group">
-					      			{{Form::label('email','Email:')}}
-					      			{{Form::text('email', ['class' => 'form-control', 'value' => '{{ old('email') }}', 'required', 'autofocus'])}}
+					      			{!! Form::email('email', $value = old('email'), $attributes = array('class' => 'form-control', 'required', 'autofocus')) !!}
 				      			</div>
 				      			<div class="form-group">
-					      			{{Form::label('password','Password:')}}
-					      			{{Form::password('password', ['class' => 'form-control', 'placeholder' => 'Password', 'required'])}}
+					      			{!! Form::password('password', $attributes = array('class' => 'form-control', 'placeholder' => 'Password', 'required')) !!}
 					      		</div>
 					      		<div class="form-group">
-					      			{{Form::submit('Login', array('class'=>'btn btn-lg btn-cta-secondary btn-block'))}}
+					      			{!! Form::submit('Login', array('class'=>'btn btn-lg btn-cta-secondary btn-block')) !!}
 					      		</div>
-						{{ Form::close() }}
+						{!!  Form::close()  !!}
 				</center>
 			</div>
 		</div>
