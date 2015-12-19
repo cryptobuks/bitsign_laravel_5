@@ -12,7 +12,7 @@ class CreateFileRecordsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('filerecords', function(Blueprint $table)
+		Schema::create('file_records', function(Blueprint $table)
 		{
 			$table->increments('id');
 			$table->string('hash', 64);
@@ -29,7 +29,7 @@ class CreateFileRecordsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('filerecords');
+		Schema::drop('file_records');
 	}
 
 }

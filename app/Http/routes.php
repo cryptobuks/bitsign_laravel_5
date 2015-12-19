@@ -28,3 +28,15 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 // Registration Routes...
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
+
+/*Routing for Contracts Controller*/
+
+Route::resource('contracts', 'ContractController', 
+array('only' => array('index', 'create', 'show', 'store')));
+
+/*Routing for File Controller*/
+
+Route::resource('file', 'FileRecordController', 
+	array('only' => array('store')));
+
+Route::get('file/{id}', ['uses' => 'FileRecordController@create']);

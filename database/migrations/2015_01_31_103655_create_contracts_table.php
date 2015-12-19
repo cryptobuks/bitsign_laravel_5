@@ -19,7 +19,7 @@ class CreateContractsTable extends Migration {
 			$table->longText('content');
 			$table->timestamps();
 			$table->integer('user_id')->length(10)->unsigned()->index();
-			$table->string('type',30);
+			$table->integer('type')->length(2);
 		});
 	}
 
