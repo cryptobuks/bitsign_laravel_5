@@ -47,8 +47,5 @@
     },
     "config": {
         "preferred-install": "dist"
-    },
-    "require": {
-    "laravelcollective/html": "~5.0"
     }
 }
