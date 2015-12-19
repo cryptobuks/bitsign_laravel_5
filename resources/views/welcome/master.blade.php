@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	@include('common.head')
+	<link href="/css/main.css" rel="stylesheet">
 	<title>BitSign</title>
 	<meta name="generator" content="Bootply" />
 	<link href='http://fonts.googleapis.com/css?family=Lato:300,400,300italic,400italic' rel='stylesheet' type='text/css'>

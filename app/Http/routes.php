@@ -15,6 +15,11 @@ Route::get('/', function () {
     return view('layouts.index');
 });
 
+/* Dash View Loader */
+
+Route::get('dashboard', 'DashController@showDash');
+Route::get('dashboard/index', 'DashController@index');
+
 // Authentication Routes...
 Route::get('auth/login', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
