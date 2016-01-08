@@ -40,3 +40,7 @@ Route::resource('file', 'FileRecordController',
 	array('only' => array('store')));
 
 Route::get('file/{id}', ['uses' => 'FileRecordController@create']);
+
+//more tests
+Route::get('signblob', 'SignatureController@blobSign');
+Route::get('signdom', 'SignatureController@domSign');
