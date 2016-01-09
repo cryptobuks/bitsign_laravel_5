@@ -74,13 +74,23 @@ class SignatureController extends Controller
     public function domSign()
     {
         $fakeXml = new \DOMDocument();
-        $fakeXml->loadXML('<?xml version="1.0" encoding="UTF-8"?><foo><bar><baz>I am a happy camper</baz></bar></foo>');
-
-        $node = $fakeXml->getElementsByTagName('baz')->item(0);
+        $fakeXml->loadXML('<?xml version="1.0" encoding="UTF-8"?><foo><bar><baz>I am a happy camper</baz><baz>So am I</baz><baz>A third one bitch</baz></bar></foo>');
+        //dd($fakeXml->saveXML());
+        $nodes = $fakeXml->getElementsByTagName('baz');
+        $countr=1;
+        foreach ($nodes as $node) {
+            try{
+                XmlDigitalSignature::addObject($node, 'object'.$countr);
+            }
+            catch (\UnexpectedValueException $e){
+                print_r($e);
+                exit(1);
+            }
+            $countr++;
+        }
 
         try
         {
-            XmlDigitalSignature::addObject($node, 'object', true);
             XmlDigitalSignature::sign();
             XmlDigitalSignature::verify();
         }
