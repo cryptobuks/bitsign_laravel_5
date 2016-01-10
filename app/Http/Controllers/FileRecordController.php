@@ -68,7 +68,7 @@ class FileRecordController extends Controller
 		
 		//Set the upload parameters
 		$assetPath = '/uploads';
-		$uploadPath = public_path($assetPath);
+		$uploadPath = storage_path($assetPath);
 
 		//Get files from POST Input
 		$all_uploads = $request->file('files'); // your file upload input field in the form should be named 'files' or 'files[]'
