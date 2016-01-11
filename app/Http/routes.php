@@ -42,5 +42,5 @@ Route::resource('file', 'FileRecordController',
 Route::get('file/{id}', ['uses' => 'FileRecordController@create']);
 
 //more tests
-Route::get('signblob', 'SignatureController@blobSign');
-Route::get('signdom', 'SignatureController@domSign');
+Route::get('signblob', 'SignatureTestController@blobSign');
+Route::get('signdom', 'SignatureTestController@domSign');

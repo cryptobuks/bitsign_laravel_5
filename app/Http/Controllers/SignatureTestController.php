@@ -21,7 +21,7 @@ use XmlDigitalSignature;
  *
  * @author Graham Campbell <graham@alt-three.com>
  */
-class SignatureController extends Controller
+class SignatureTestController extends Controller
 {
     /***Initializes the class***/
 

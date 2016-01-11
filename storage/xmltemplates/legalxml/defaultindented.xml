@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE contract SYSTEM
+eContracts-Reference.dtd>
+<contract xmlns="urn:oasis:names:tc:eContracts:1:0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<metadata>
+		<conditions>
+			<condition name="INTNL">International</condition>
+		</conditions>
+		<dc:title></dc:title>
+		<dc:creator></dc:creator>
+		<dc:contributor></dc:contributor>
+		<dc:subject></dc:subject>
+		<dc:publisher>BITSIGN.IT</dc:publisher>
+		<dc:type></dc:type>
+		<dc:language>en</dc:language>
+		<!-- <dc:date>2005-09-20</dc:date> -->
+		<dc:rights></dc:rights>
+	</metadata>
+	<title><text>
+	</text>
+	</title>
+	<subtitle>
+	</subtitle>
+	<contract-front>
+		<date-block>
+			<date></date>
+		</date-block>
+		<parties><title><text>Parties</text></title>
+			<party>
+				<person-record>
+					<name>company_name</name> having
+					its office at <address>company_address</address>
+				</person-record>, hereafter referred to as
+				"<term>company_term</term>"
+			</party>
+			<party>
+				<person-record>
+					<name>person_name</name> of
+					<address>person_address</address>
+				</person-record>
+					and 
+				<person-record>
+					<name>person_name</name> of
+					<address>person_address</address>
+				</person-record>, herafter collectively referred to as
+				"Limited Partners"
+			</party>
+		</parties>
+	</contract-front>
+	<body>
+		<block>
+			<definition>
+				<terms>
+					<term>term</term> or
+					<term>term</term>
+				</terms>
+				<block>
+					<text>term_meaning
+					</text>
+				</block>
+			</definition>
+		</block>
+		<item>
+			<block>
+				<text></text>
+					<inclusion class="inclusion_class">
+						<block number-type="none">
+							<text>/BNML Standard</text>
+							<item>
+								<block number-type="none">
+									<text>/RelaxNG</text>
+									<item>
+										<block>
+											<text>bnml-standard.rnc</text>
+											<text>bnml-document.rnc</text>
+											<text>bnml-contract.rnc</text>
+											<text>bnml-correspondence.rnc</text>
+											<text>bnml-core.rnc</text>
+											<text>bnml-structure.rnc</text>
+											<text>dc-metadata.rnc</text>
+											<text>xi-include.rnc</text>
+										</block>
+									</item>
+								</block>
+							</item>
+						</block>
+					</inclusion>
+					<inclusion class="example">
+						<block>
+							<text>
+								<phrase class="code">bnml-s-application name.rnc</phrase>
+							</text>
+						</block>
+					</inclusion>
+				</block>
+		</item>
+		<item>
+			<block>
+				<text>The location to deliver <em>the item</em>
+				<strike>has to be one of <statutory-em>designated
+					terminals.</statutory-em></strike> will be any places.</text>
+			</block>
+			<block>
+				<text>The location to deliver <em>the item</em>
+				<strike>has to be one of <statutory-em>designated
+				terminals.</statutory-em></strike> will be any places.</text>
+			</block>
+		</item>
+		<xi:include href="Inventry01.xml">
+			<xi:fallback>
+				<xi:include href="Acct.xml">
+					<xi:fallback>This is the fallback of Acct.xml.</xi:fallback>
+				</xi:include>
+			</xi:fallback>
+		</xi:include>
+		<xi:include href="Terminal.xml"/>
+		<block condition="jurisdiction-US">
+			<text>A United States - specific term in the contract</text>
+		</block>
+		<block condition="jurisdiction-AU">
+			<text>An Australia-specific statement in the contract</text>
+		</block>
+		<block condition="jurisdiction-AU jurisdiction-US">
+			<text> This block will be included if either value is true.</text>
+		</block>
+	</body>
+	<attachments>
+		<attachment class="appendix" id="a1" number="15">
+			<title><text>Form of notice in Schema files</text></title>
+			<block><text>They must be sent regular mail.</text></block>
+			<block>
+				<text>Standard Schema
+				<reference href="http://www.elkera.com" print-url="true">
+				can be read on the web easily!</reference>.</text>
+			</block>
+		</attachment>
+	</attachments>
+	<back>
+		<party-signature>
+			<signatory-group>
+				<block> </block>
+				<signatory-record>
+					<signatory id="T0001" xml:lang="ja">
+						<signature-line id="I0001" xml:lang="en_US">
+							<text>Mr. Signatory Jr.</text>
+							<field>Field for a text.</field>
+						</signature-line>
+					</signatory>
+					<witness>
+						<signature-line id="I0002" xml:lang="fr">
+							<text>Ms. Witness Arcole</text>
+							<field>Field for a text.</field>
+						</signature-line>
+					</witness>
+				</signatory-record>
+			</signatory-group>
+		</party-signature>
+	</back>
+</contract>

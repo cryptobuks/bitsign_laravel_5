@@ -68,7 +68,7 @@ class FileRecordController extends Controller
 		
 		//Set the upload parameters
 		$assetPath = '/uploads';
-		$uploadPath = public_path($assetPath);
+		$uploadPath = storage_path($assetPath);
 
 		//Get files from POST Input
 		$all_uploads = $request->file('files'); // your file upload input field in the form should be named 'files' or 'files[]'
@@ -90,14 +90,17 @@ class FileRecordController extends Controller
 	        );
 
 	        if ($validator->passes()) {
-	            $filename        = str_random(6) . '_' . $upload->getClientOriginalName();
+	        	$original_name = $upload->getClientOriginalName();
+	        	$salt = str_random(10);
+	            $filename        = $salt.'_'.$original_name;
 	        	$uploadSuccess   = $upload->move($uploadPath, $filename);
 				if($uploadSuccess){
 			 	$shafile = hash_file('sha256', $uploadPath.'/'.$filename);
 			 	// store in database
 			        $filerecord = new FileRecord;
 			        $filerecord->hash = $shafile;
-			        $filerecord->filename = $filename;
+			        $filerecord->filename = $original_name;
+			        $filerecord->salt = $salt;
 			        $filerecord->contract_id = $contract_id;
 			        $filerecord->save();
 
