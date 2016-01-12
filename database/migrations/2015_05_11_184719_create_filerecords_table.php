@@ -15,7 +15,7 @@ class CreateFileRecordsTable extends Migration {
 		Schema::create('file_records', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('hash', 64);
+			$table->char('hash', 64);
 			$table->string('filename', 100);
 			$table->integer('contract_id')->length(14)->unsigned()->index();
 			$table->timestamps();

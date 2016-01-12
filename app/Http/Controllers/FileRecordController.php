@@ -95,7 +95,7 @@ class FileRecordController extends Controller
 	            $filename        = $salt.'_'.$original_name;
 	        	$uploadSuccess   = $upload->move($uploadPath, $filename);
 				if($uploadSuccess){
-			 	$shafile = hash_file('sha256', $uploadPath.'/'.$filename);
+			 	$shafile = base64_encode(hash_file('sha384', $uploadPath.'/'.$filename, true));
 			 	// store in database
 			        $filerecord = new FileRecord;
 			        $filerecord->hash = $shafile;
