@@ -27,11 +27,6 @@
 			      			{!! Form::text('l_name') !!}
 		      			</div>
 		      			<div class="form-group">
-			      			{!! Form::label('name','Username:') !!}
-			      			<br>
-			      			{!! Form::text('name') !!}
-		      			</div>
-		      			<div class="form-group">
 			      			{!! Form::label('email','Email:') !!}
 			      			<br>
 			      			{!! Form::text('email') !!}
