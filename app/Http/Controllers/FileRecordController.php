@@ -95,16 +95,20 @@ class FileRecordController extends Controller
 	            $filename        = $salt.'_'.$original_name;
 	        	$uploadSuccess   = $upload->move($uploadPath, $filename);
 				if($uploadSuccess){
-			 	$shafile = base64_encode(hash_file('sha384', $uploadPath.'/'.$filename, true));
-			 	// store in database
-			        $filerecord = new FileRecord;
-			        $filerecord->hash = $shafile;
-			        $filerecord->filename = $original_name;
-			        $filerecord->salt = $salt;
-			        $filerecord->contract_id = $contract_id;
-			        $filerecord->save();
-
-			   	$files[] = 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile ;
+				 	$shafile = base64_encode(hash_file('sha384', $uploadPath.'/'.$filename, true));
+				 	if (Contract::find($contract_id)->filerecords()->where('hash', $shafile)->first()) {
+				 		$errors[] = 'File ' . $upload->getClientOriginalName() . ' has already been added to this contract';
+				 	}
+				 	else{
+				 		// store in database
+				        $filerecord = new FileRecord;
+				        $filerecord->hash = $shafile;
+				        $filerecord->filename = $original_name;
+				        $filerecord->salt = $salt;
+				        $filerecord->contract_id = $contract_id;
+				        $filerecord->save();
+						$files[] = 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile ;
+				 	}
 				} 
 	        } 
 	        else {
