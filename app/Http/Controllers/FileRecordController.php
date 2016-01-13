@@ -84,6 +84,11 @@ class FileRecordController extends Controller
 	    // Loop through all uploaded files
 	    foreach ($all_uploads as $upload) {
 
+	    	$currentfiles = Contract::find($contract_id)->filerecords();
+		 	if ($currentfiles->count() >= 10) {
+		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed)';
+		 		break;
+		 	}
 	        $validator = Validator::make(
 	            array('file' => $upload),
 	            array('file' => 'required|mimes:jpeg,png|image|max:1000')
@@ -96,7 +101,8 @@ class FileRecordController extends Controller
 	        	$uploadSuccess   = $upload->move($uploadPath, $filename);
 				if($uploadSuccess){
 				 	$shafile = base64_encode(hash_file('sha384', $uploadPath.'/'.$filename, true));
-				 	if (Contract::find($contract_id)->filerecords()->where('hash', $shafile)->first()) {
+				 	//check whether file already exists for this contract
+				 	if ($currentfiles->where('hash', $shafile)->first()) {
 				 		$errors[] = 'File ' . $upload->getClientOriginalName() . ' has already been added to this contract';
 				 	}
 				 	else{
