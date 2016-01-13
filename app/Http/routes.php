@@ -21,9 +21,10 @@ Route::get('dashboard', 'DashController@showDash');
 Route::get('dashboard/index', 'DashController@index');
 
 // Authentication Routes...
-Route::get('auth/login', 'Auth\AuthController@getLogin');
+Route::get('auth/login/{provider?}', 'Auth\AuthController@getLogin');
 Route::post('auth/login', 'Auth\AuthController@postLogin');
 Route::get('auth/logout', 'Auth\AuthController@getLogout');
+Route::get('auth/callback/{provider}', 'Auth\AuthController@handleProviderCallback');
 
 // Registration Routes...
 Route::get('auth/register', 'Auth\AuthController@getRegister');

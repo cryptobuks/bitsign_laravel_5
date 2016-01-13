@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\User;
 use Validator;
+use Socialite;
+use Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
@@ -23,7 +25,7 @@ class AuthController extends Controller
 
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
 
-    protected $redirectPath = '/dashboard';
+    protected $redirectPath = 'dashboard';
 
     /**
      * Create a new authentication controller instance.
@@ -33,6 +35,68 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('guest', ['except' => 'getLogout']);
+    }
+
+    /**
+     * Override default method of AuthenticatesAndRegistersUsers Trait
+     * redirect to login pages
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getLogin($provider = null)
+    {
+        
+        if (!is_null($provider)) {
+            return Socialite::driver($provider)->redirect();
+        }
+        if (view()->exists('auth.authenticate')) {
+            return view('auth.authenticate');
+        }
+
+        return view('auth.login');
+    }
+
+    /**
+     * Obtain the user information from provider
+     *
+     * @return Response
+     */
+    public function handleProviderCallback($provider)
+    {
+        $validator = Validator::make(
+                array('provider' => $provider),
+                array('provider' => 'required|in:facebook,google,slack,github')
+            );
+
+        if ($validator->fails()) {
+            abort(404, 'Unauthorized action.');
+        }
+        
+        $user = Socialite::driver($provider)->user();
+         
+        // storing data to our use table and logging them in
+        $names = explode(" ", $user->getName());
+        $data = [
+            'email' => $user->getEmail(),
+            'f_name' => $names[0],
+            'l_name' => $names[1] ?: ''
+        ];
+
+        $validator = Validator::make(
+                $data, [
+            'email' => 'required|email|max:255',
+            'f_name' => 'required|alpha|max:50',
+            'l_name' => 'required|alpha|max:50',
+        ]);
+
+        if ($validator->fails()) {
+            abort(422, 'Invalid Email, or Empty Name');
+        }
+     
+        Auth::login(User::firstOrCreate($data));
+
+        //after login redirecting to home page
+        return redirect()->intended($this->redirectPath());
     }
 
     /**
