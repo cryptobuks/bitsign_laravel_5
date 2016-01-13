@@ -150,6 +150,7 @@ return [
          * Vendor Service Providers...
          */
         'Collective\Html\HtmlServiceProvider',
+        Laravel\Socialite\SocialiteServiceProvider::class,
 
     ],
 
@@ -198,9 +199,10 @@ return [
         'URL'       => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View'      => Illuminate\Support\Facades\View::class,
-        'Form' => 'Collective\Html\FormFacade',
-        'Html' => 'Collective\Html\HtmlFacade',
-        'XmlDigitalSignature' => Iwalpola\XmlDigitalSignature\XmlDigitalSignatureFacade::class,
+        'Form'      => 'Collective\Html\FormFacade',
+        'Html'      => 'Collective\Html\HtmlFacade',
+        'XmlDSig'   => Iwalpola\XmlDigitalSignature\XmlDigitalSignatureFacade::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
 
     ],
 

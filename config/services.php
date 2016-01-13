@@ -35,4 +35,34 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'facebook' => [
+        'client_id'    => env('FACEBOOK_KEY'),
+        'client_secret' => env('FACEBOOK_SECRET'),
+        'redirect' => env('FACEBOOK_CALLBACK'),
+    ],
+
+    'dropbox' => [
+        'key'    => env('DROPBOX_KEY'),
+        'secret' => env('DROPBOX_SECRET'),
+        'redirect' => env('DROPBOX_CALLBACK'),
+    ],
+
+    'google' => [
+        'key'    => env('GOOGLE_KEY'),
+        'secret' => env('GOOGLE_SECRET'),
+        'redirect' => env('GOOGLE_CALLBACK'),
+    ],
+
+    'slack' => [
+        'key'    => env('SLACK_KEY'),
+        'secret' => env('SLACK_SECRET'),
+        'redirect' => env('SLACK_CALLBACK'),
+    ],
+
+    'github' => [
+        'client_id'    => env('GITHUB_KEY'),
+        'client_secret' => env('GITHUB_SECRET'),
+        'redirect' => env('GITHUB_CALLBACK'),
+    ],
+
 ];
