@@ -49,23 +49,20 @@ class FileRecordController extends Controller
 		
 		$contract_id = $request->contract_id;
 
+		//instantiate arrays
+		$errors = array();
+	    $files = array();
+
 		//Check whether this contract belongs to this user
 
 		if (Contract::find($contract_id)->user_id != Auth::user()->id){
-			$error = array('0' => 'You are not the creator. Get out now to avoid a lawsuit');
+			$errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
 			return array(
+				'files' => $files,
 	        	'errors' => $errors
 	    	);
 		}
 
-		// Function for converting from hexadecimal to ascii
-
-		function hex2str($hex) {
-    	$str = '';
-    	for($i=0;$i<strlen($hex);$i+=2) $str .= chr(hexdec(substr($hex,$i,2)));
-    	return $str;
-		}
-		
 		//Set the upload parameters
 		$assetPath = '/uploads';
 		$uploadPath = storage_path($assetPath);
@@ -77,9 +74,6 @@ class FileRecordController extends Controller
 	    if (!is_array($all_uploads)) {
 	        $all_uploads = array($all_uploads);
 	    }
-
-	    $errors = array();
-	    $files = array();
 
 	    // Loop through all uploaded files
 	    foreach ($all_uploads as $upload) {

@@ -57,8 +57,7 @@ class SigneeRecordController extends Controller
 
         //Check whether this user has permission to edit this contract
         if (Contract::find($contract_id)->user_id != Auth::user()->id){
-            $errors = array('0' => 'You are not the creator. Get out now to avoid a lawsuit');
-            return response()->json(array('errors' => $errors));
+            abort(422);
         }
 
         //Check whether user is registered
