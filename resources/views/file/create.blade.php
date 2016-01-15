@@ -38,13 +38,18 @@
 				    <input type="hidden" value="{{$contract_id}}" name="contract_id"></input>
 				</form>
 				<br>
-			    <!-- The global progress bar -->
-			    <div id="progress" class="progress">
-			        <div class="progress-bar progress-bar-success"></div>
-			    </div>
 			    <!-- The container for the uploaded files -->
 			    <div id="files" class="files"></div>
 			    <br>
+			    <div class="next button">
+					<div class="col-sm-2">
+						<button id="btnNext" class="btn btn-primary btn-label-left btn-block">
+						<span><i class="fa fa-save"></i></span>
+							Save and Proceed
+						</button>
+					</div>
+				</div>
+				<br><br>
 			</div>
 		</div>
 	</div>
@@ -57,7 +62,6 @@ $(function () {
     $('#fileupload').fileupload({
         dataType: 'json',
         done: function (e, data) {
-        	console.log(data);
             $.each(data._response.result.files, function (index, filename) {
                 $('<p/>').text(filename).appendTo('#files');
             });
@@ -65,6 +69,10 @@ $(function () {
                 $('<p/>').text(error).appendTo('#files');
             });
         }
+    });
+    $("#btnNext").click(function(){
+    	var ajax_url = 'signeerecord/' + '{{$contract_id}}';
+		LoadAjaxContent(ajax_url);
     });
 });
 </script>
