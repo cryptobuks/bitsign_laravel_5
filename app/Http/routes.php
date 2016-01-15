@@ -41,3 +41,8 @@ Route::resource('file', 'FileRecordController',
 	array('only' => array('store')));
 
 Route::get('file/{id}', ['uses' => 'FileRecordController@create']);
+
+/*Routing for Signature Record Controller*/
+
+Route::get('signeerecord/{id}', ['uses' => 'SigneeRecordController@create']);
+Route::post('signeerecord', ['uses' => 'SigneeRecordController@store']);
