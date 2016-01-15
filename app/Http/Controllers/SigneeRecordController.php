@@ -14,9 +14,27 @@ use App\Http\Controllers\Controller;
 
 class SigneeRecordController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * generate a rendom hex token
+     *
+     * @return hex string
+     */
+
     private function getRandomHex($num_chars=20) {
         return bin2hex(openssl_random_pseudo_bytes($num_chars/2));
     }
+
     /**
      * Display a listing of the resource.
      *
