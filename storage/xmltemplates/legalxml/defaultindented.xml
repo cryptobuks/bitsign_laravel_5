@@ -63,7 +63,7 @@ eContracts-Reference.dtd>
 		<item>
 			<block>
 				<text></text>
-					<inclusion class="inclusion_class">
+					<inclusion class="inclusion_cat">
 						<block number-type="none">
 							<text>/BNML Standard</text>
 							<item>

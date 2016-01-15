@@ -11,10 +11,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Routing\Controller;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
-use XmlDigitalSignature;
+use XmlDSig;
+use App\Http\Controllers\Controller;
 
 /**
  * This is the home controller class.
@@ -27,15 +28,15 @@ class SignatureTestController extends Controller
 
     function __construct()
     {
-        XmlDigitalSignature::setCryptoAlgorithm(1);
-        XmlDigitalSignature::setDigestMethod('sha512');
-        XmlDigitalSignature::forceStandalone();
+        XmlDSig::setCryptoAlgorithm(1);
+        XmlDSig::setDigestMethod('sha512');
+        XmlDSig::forceStandalone();
 
         try
         {
-            XmlDigitalSignature::loadPrivateKey(storage_path('keys/private.pem'), 'MrMarchello');
-            XmlDigitalSignature::loadPublicKey(storage_path('keys/public.pem'));
-            XmlDigitalSignature::loadPublicXmlKey(storage_path('keys/public.xml'));
+            XmlDSig::loadPrivateKey(storage_path('keys/private.pem'), 'MrMarchello');
+            XmlDSig::loadPublicKey(storage_path('keys/public.pem'));
+            XmlDSig::loadPublicXmlKey(storage_path('keys/public.xml'));
         }
         catch (\UnexpectedValueException $e)
         {
@@ -51,19 +52,25 @@ class SignatureTestController extends Controller
      */
     public function blobSign()
     {
-        try
-        {
-            XmlDigitalSignature::addObject('Lorem ipsum dolor sit amet');
-            XmlDigitalSignature::sign();
-            XmlDigitalSignature::verify();
-        }
-        catch (\UnexpectedValueException $e)
-        {
-            print_r($e);
-            exit(1);
-        }
+        $client = new Client();
+     $response = $client->post('https://api.blockcypher.com/v1/bcy/test/addrs', [
+            'token' => '0ca04b9e7819100572b03eb19ed5fd0c',
+        ]);
+    var_dump(json_decode($response->getBody()));
+        // dd(hash_algos());
+        // try
+        // {
+        //     XmlDSig::addObject('Lorem ipsum dolor sit amet');
+        //     XmlDSig::sign();
+        //     XmlDSig::verify();
+        // }
+        // catch (\UnexpectedValueException $e)
+        // {
+        //     print_r($e);
+        //     exit(1);
+        // }
 
-        dd(XmlDigitalSignature::getSignedDocument());
+        // dd(XmlDSig::getSignedDocument());
     }
 
     /**
@@ -80,7 +87,7 @@ class SignatureTestController extends Controller
         $countr=1;
         foreach ($nodes as $node) {
             try{
-                XmlDigitalSignature::addObject($node, 'object'.$countr);
+                XmlDSig::addObject($node, 'object'.$countr);
             }
             catch (\UnexpectedValueException $e){
                 print_r($e);
@@ -91,8 +98,8 @@ class SignatureTestController extends Controller
 
         try
         {
-            XmlDigitalSignature::sign();
-            XmlDigitalSignature::verify();
+            XmlDSig::sign();
+            XmlDSig::verify();
         }
         catch (\UnexpectedValueException $e)
         {
@@ -100,6 +107,6 @@ class SignatureTestController extends Controller
             exit(1);
         }
 
-        dd(XmlDigitalSignature::getSignedDocument());
+        dd(XmlDSig::getSignedDocument());
     }
 }

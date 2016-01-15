@@ -203,7 +203,6 @@ return [
         'Html'      => 'Collective\Html\HtmlFacade',
         'XmlDSig'   => Iwalpola\XmlDigitalSignature\XmlDigitalSignatureFacade::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
-
     ],
 
 ];

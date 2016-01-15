@@ -52,7 +52,7 @@ class FileRecordController extends Controller
 		//Check whether this contract belongs to this user
 
 		if (Contract::find($contract_id)->user_id != Auth::user()->id){
-			$error = array('0' => 'You are not the creator. Get out now to avoid a lawsuit');
+			$errors = array('0' => 'You are not the creator. Get out now to avoid a lawsuit');
 			return array(
 	        	'errors' => $errors
 	    	);
@@ -84,6 +84,11 @@ class FileRecordController extends Controller
 	    // Loop through all uploaded files
 	    foreach ($all_uploads as $upload) {
 
+	    	$currentfiles = Contract::find($contract_id)->filerecords();
+		 	if ($currentfiles->count() >= 10) {
+		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed tits!)';
+		 		break;
+		 	}
 	        $validator = Validator::make(
 	            array('file' => $upload),
 	            array('file' => 'required|mimes:jpeg,png|image|max:1000')
@@ -95,16 +100,21 @@ class FileRecordController extends Controller
 	            $filename        = $salt.'_'.$original_name;
 	        	$uploadSuccess   = $upload->move($uploadPath, $filename);
 				if($uploadSuccess){
-			 	$shafile = base64_encode(hash_file('sha384', $uploadPath.'/'.$filename, true));
-			 	// store in database
-			        $filerecord = new FileRecord;
-			        $filerecord->hash = $shafile;
-			        $filerecord->filename = $original_name;
-			        $filerecord->salt = $salt;
-			        $filerecord->contract_id = $contract_id;
-			        $filerecord->save();
-
-			   	$files[] = 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile ;
+				 	$shafile = base64_encode(hash_file('sha384', $uploadPath.'/'.$filename, true));
+				 	//check whether file already exists for this contract
+				 	if ($currentfiles->where('hash', $shafile)->first()) {
+				 		$errors[] = 'File ' . $upload->getClientOriginalName() . ' has already been added to this contract';
+				 	}
+				 	else{
+				 		// store in database
+				        $filerecord = new FileRecord;
+				        $filerecord->hash = $shafile;
+				        $filerecord->filename = $original_name;
+				        $filerecord->salt = $salt;
+				        $filerecord->contract_id = $contract_id;
+				        $filerecord->save();
+						$files[] = 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile ;
+				 	}
 				} 
 	        } 
 	        else {
