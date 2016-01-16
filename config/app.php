@@ -145,6 +145,7 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\UserEncrypterServiceProvider::class,
 
         /*
          * Vendor Service Providers...
@@ -203,6 +204,7 @@ return [
         'Html'      => 'Collective\Html\HtmlFacade',
         'XmlDSig'   => Iwalpola\XmlDigitalSignature\XmlDigitalSignatureFacade::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
+        'UCrypt'    => App\Packages\UserEncrypterFacade::class,
     ],
 
 ];
