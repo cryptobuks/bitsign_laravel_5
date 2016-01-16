@@ -40,4 +40,13 @@ class Contract extends Model
     {
         return $this->hasMany(Signature::class);
     }
+
+    /**
+     * Get all of the pending signature requests attached to this contract.
+     */
+
+    public function pendingsigrequests()
+    {
+        return $this->hasMany(PendingSigrequest::class);
+    }
 }

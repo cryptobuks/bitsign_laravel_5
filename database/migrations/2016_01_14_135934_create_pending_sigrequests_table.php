@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePendingSigneesTable extends Migration
+class CreatePendingSigrequestsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,11 +12,10 @@ class CreatePendingSigneesTable extends Migration
      */
     public function up()
     {
-        Schema::create('pending_signees', function(Blueprint $table)
+        Schema::create('pending_sigrequests', function(Blueprint $table)
         {
             $table->integer('contract_id')->length(12)->unsigned()->index();
-            $table->string('email');
-            $table->string('token',20);
+            $table->integer('pending_user_id')->length(12)->unsigned()->index();
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ class CreatePendingSigneesTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::drop('pending_sigrequests');
     }
 }
