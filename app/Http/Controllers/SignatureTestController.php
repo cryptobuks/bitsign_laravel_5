@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use XmlDSig;
 use App\Http\Controllers\Controller;
+use UCrypt;
 
 /**
  * This is the home controller class.
@@ -52,11 +53,25 @@ class SignatureTestController extends Controller
      */
     public function blobSign()
     {
-        $client = new Client();
-     $response = $client->post('https://api.blockcypher.com/v1/bcy/test/addrs', [
-            'token' => '0ca04b9e7819100572b03eb19ed5fd0c',
-        ]);
-    var_dump(json_decode($response->getBody()));
+        Ucrypt::setKey('0tu4c0vaJ1cvSNtu7SLr3eIfmVfOfBuB');
+        $plaintextval = 'encryptmebitch';
+        $encryptedval = UCrypt::encrypt($plaintextval);
+        try {
+            $decryptedval = UCrypt::decrypt($encryptedval);
+        } catch (Exception $e) {
+            $decryptedval = 'fail';
+        }
+        $resultss = [
+        'plaintextval'=> $plaintextval,
+        'encryptedval'=> $encryptedval,
+        'decryptedval'=> $decryptedval
+        ];
+        var_dump($resultss);
+    //     $client = new Client();
+    //  $response = $client->post('https://api.blockcypher.com/v1/bcy/test/addrs', [
+    //         'token' => '0ca04b9e7819100572b03eb19ed5fd0c',
+    //     ]);
+    // var_dump(json_decode($response->getBody()));
         // dd(hash_algos());
         // try
         // {

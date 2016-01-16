@@ -7,6 +7,7 @@ use App\FileRecord;
 use App\Contract;
 use Validator;
 use Auth;
+use Log;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -49,11 +50,17 @@ class FileRecordController extends Controller
 		
 		$contract_id = $request->contract_id;
 
+		//instantiate arrays
+		$errors = array();
+	    $files = array();
+
 		//Check whether this contract belongs to this user
 
 		if (Contract::find($contract_id)->user_id != Auth::user()->id){
-			$errors = array('0' => 'You are not the creator. Get out now to avoid a lawsuit');
+			$errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
+			Log::warning('Showing error array for case1: '.$errors[0]);
 			return array(
+				'files' => $files,
 	        	'errors' => $errors
 	    	);
 		}
@@ -78,15 +85,13 @@ class FileRecordController extends Controller
 	        $all_uploads = array($all_uploads);
 	    }
 
-	    $errors = array();
-	    $files = array();
-
 	    // Loop through all uploaded files
 	    foreach ($all_uploads as $upload) {
 
 	    	$currentfiles = Contract::find($contract_id)->filerecords();
 		 	if ($currentfiles->count() >= 10) {
 		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed tits!)';
+		 		Log::warning('Showing error array for case1: '.$errors[0]);
 		 		break;
 		 	}
 	        $validator = Validator::make(
@@ -104,6 +109,7 @@ class FileRecordController extends Controller
 				 	//check whether file already exists for this contract
 				 	if ($currentfiles->where('hash', $shafile)->first()) {
 				 		$errors[] = 'File ' . $upload->getClientOriginalName() . ' has already been added to this contract';
+				 		Log::warning('Showing error array for case1: '.$errors[0]);
 				 	}
 				 	else{
 				 		// store in database
@@ -120,6 +126,7 @@ class FileRecordController extends Controller
 	        else {
 	            // Collect error messages
 	            $errors[] = 'File ' . $upload->getClientOriginalName() . ':' . $validator->messages()->first('file');
+	            Log::warning('Showing error array for case1: '.$errors[0]);
 	        }
 
 	    }
