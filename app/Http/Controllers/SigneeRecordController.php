@@ -7,7 +7,8 @@ use Auth;
 use Mail;
 use App\User;
 use App\Signature;
-use App\PendingSignee;
+use App\PendingSigrequest;
+use App\PendingUser;
 use App\Contract;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -97,23 +98,28 @@ class SigneeRecordController extends Controller
 
         //else try to send a message, and add a record to pending users
         else{
-            if (PendingSignee::where(['contract_id'=>$contract_id,'email'=>$usr_email])->first()) {
+            //add a record to pending users if not exists
+            $pendinguser = PendingUser::firstOrCreate(array(
+                'email' => $usr_email
+                ));
+            $pendinguser->token = $this->getRandomHex();
+            $pendinguser->save();
+            //check if pending user is already added to contract
+            if (PendingSigrequest::where(['contract_id'=>$contract_id,'pending_user_id'=>$pendinguser->id])->first()) {
                 return response()->json(['exists' => 0, 'email' => $usr_email, 'message'=>'This person has already been added to this contract :']);
             }
-            //add a record to pendingsignees
-            $emailtoken = $this->getRandomHex();
-            $pendingsignee = new PendingSignee;
-            $pendingsignee->contract_id = $contract_id;
-            $pendingsignee->email = $usr_email;
-            $pendingsignee->token = $emailtoken;
-            $pendingsignee->save();
+            //add a record to pending sigrequsts
+            $pendingsigrequest = PendingSigrequest::create(array(
+                'contract_id' => $contract_id,
+                'pending_user_id' => $pendinguser->id
+                ));
             //fetch unsigned signature requests for this email address
-            $unsigned_contracts = PendingSignee::where('email',$usr_email);
+            $unsigned_contracts = PendingSigrequest::where('pending_user_id',$pendinguser->id);
             //send email
-            Mail::send('emails.pendingsignatures', ['unsigned_contracts' => $unsigned_contracts], function ($message) use ($pendingsignee) {
+            Mail::send('emails.pendingsignatures', ['unsigned_contracts' => $unsigned_contracts, 'pending_user' => $pendinguser], function ($message) use ($usr_email) {
             $message->from('admin@bitsign.it', 'BitSign.it');
 
-            $message->to($pendingsignee->email)->subject('You have been requested to sign a document');
+            $message->to($usr_email)->subject('You have been requested to sign a document');
             });
             //respond with JSON
             return response()->json(['exists' => 0, 'email' => $usr_email, 'message'=>'An invitation to join Bitsign.it has been sent to ']);
