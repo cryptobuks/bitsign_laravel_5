@@ -3,16 +3,10 @@
 namespace App;
 
 use UCrypt;
+use RuntimeException;
 
 trait Encryption
 {
-    /**
-     * The attributes that should be encrypted.
-     *
-     * @var string
-     */
-    protected $encrypted[];
-
     /**
      * The encryption key.
      *
@@ -39,7 +33,15 @@ trait Encryption
      */
     protected function satisfiesConditions($key)
     {
-    	return array_key_exists($key, array_flip($this->encrypted)) && !is_null($this->secret);
+    	if (array_key_exists($key, array_flip($this->encrypted))) {
+            if (!is_null($this->secret)) {
+                return true;
+            }
+            else {
+                throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+            }
+        }
+        return false;
     }
 
     /**
@@ -50,7 +52,7 @@ trait Encryption
      */
     public function getAttribute($key)
     {
-        if (satisfiesConditions($key))
+        if ($this->satisfiesConditions($key))
         {
             UCrypt::setKey($this->secret);
             return UCrypt::decrypt(parent::getAttribute($key));
@@ -68,7 +70,7 @@ trait Encryption
      */
     public function setAttribute($key, $value)
     {
-        if (satisfiesConditions($key))
+        if ($this->satisfiesConditions($key))
         {
         	UCrypt::setKey($this->secret);
             parent::setAttribute($key, UCrypt::encrypt($value));
@@ -77,4 +79,20 @@ trait Encryption
 
         parent::setAttribute($key, $value);
     }
+    // //How to use
+    // //test encryption
+    // $crypted = new ModelName;
+    // $crypted->setSecret('oQdZj2fbSZKbk4ggMLLwP0BmG86wHgCy');
+    // $crypted->testval = 'lickmebitch';
+    // $crypted->testcryptval = $crypted->testval;
+    // $crypted->save();
+    // $crypt_id = $crypted->getKey();
+    // //test decryiption
+    // $cryptrecord = ModelName::find($crypt_id);
+    // $cryptrecord->setSecret('oQdZj2fbSZKbk4ggMLLwP0BmG86wHgCy');
+    // $resultss = [
+    // 'testval'=> $cryptrecord->testval,
+    // 'encryptedval'=> $cryptrecord->testcryptval,
+    // ];
+    // var_dump($resultss);
 }
