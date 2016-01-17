@@ -81,15 +81,16 @@ trait Encryption
     }
     // //How to use
     // //test encryption
+    // $encryption_key = 'oQdZj2fbSZKbk4ggMLLwP0BmG86wHgCy';
     // $crypted = new ModelName;
-    // $crypted->setSecret('oQdZj2fbSZKbk4ggMLLwP0BmG86wHgCy');
-    // $crypted->testval = 'lickmebitch';
-    // $crypted->testcryptval = $crypted->testval;
+    // $crypted->setSecret($encryption_key);
+    // $crypted->testval = 'dontencryptmebitch';
+    // $crypted->testcryptval = 'encryptmebitch';
     // $crypted->save();
     // $crypt_id = $crypted->getKey();
     // //test decryiption
     // $cryptrecord = ModelName::find($crypt_id);
-    // $cryptrecord->setSecret('oQdZj2fbSZKbk4ggMLLwP0BmG86wHgCy');
+    // $cryptrecord->setSecret($encryption_key);
     // $resultss = [
     // 'testval'=> $cryptrecord->testval,
     // 'encryptedval'=> $cryptrecord->testcryptval,
