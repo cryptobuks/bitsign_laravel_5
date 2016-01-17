@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\View;
 use XmlDSig;
 use App\Http\Controllers\Controller;
 use UCrypt;
+use App\Crypted;
 
 /**
  * This is the home controller class.
@@ -53,20 +54,36 @@ class SignatureTestController extends Controller
      */
     public function blobSign()
     {
-        Ucrypt::setKey('0tu4c0vaJ1cvSNtu7SLr3eIfmVfOfBuB');
-        $plaintextval = 'encryptmebitch';
-        $encryptedval = UCrypt::encrypt($plaintextval);
-        try {
-            $decryptedval = UCrypt::decrypt($encryptedval);
-        } catch (Exception $e) {
-            $decryptedval = 'fail';
-        }
+        //test encryption
+        $crypted = new Crypted;
+        $crypted->setSecret('oQdZj2fbSZKbk4ggMLLwP0BmG86wHgCy');
+        $crypted->testval = 'lickmebitch';
+        $crypted->testcryptval = $crypted->testval;
+        $crypted->save();
+        $crypt_id = $crypted->getKey();
+        //test decryiption
+        $cryptrecord = Crypted::find($crypt_id);
+        $cryptrecord->setSecret('oQdZj2fbSZKbk4ggMLLwP0BmG86wHgCy');
         $resultss = [
-        'plaintextval'=> $plaintextval,
-        'encryptedval'=> $encryptedval,
-        'decryptedval'=> $decryptedval
+        'testval'=> $cryptrecord->testval,
+        'encryptedval'=> $cryptrecord->testcryptval,
         ];
         var_dump($resultss);
+
+        // Ucrypt::setKey('0tu4c0vaJ1cvSNtu7SLr3eIfmVfOfBuB');
+        // $plaintextval = 'encryptmebitch';
+        // $encryptedval = UCrypt::encrypt($plaintextval);
+        // try {
+        //     $decryptedval = UCrypt::decrypt($encryptedval);
+        // } catch (Exception $e) {
+        //     $decryptedval = 'fail';
+        // }
+        // $resultss = [
+        // 'plaintextval'=> $plaintextval,
+        // 'encryptedval'=> $encryptedval,
+        // 'decryptedval'=> $decryptedval
+        // ];
+        // var_dump($resultss);
     //     $client = new Client();
     //  $response = $client->post('https://api.blockcypher.com/v1/bcy/test/addrs', [
     //         'token' => '0ca04b9e7819100572b03eb19ed5fd0c',
