@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('layouts.index');
-});
+Route::get('/', 'HomeController@index');
 
 /* Dash View Loader */
 
