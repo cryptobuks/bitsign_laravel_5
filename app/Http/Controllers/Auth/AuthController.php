@@ -7,6 +7,7 @@ use Validator;
 use Socialite;
 use Auth;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 
@@ -124,11 +125,32 @@ class AuthController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        //create the new user
+        $user = User::create([
             'f_name' => $data['f_name'],
             'l_name' => $data['l_name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
         ]);
+        //create and store user key (auto encrypted)
+        $user->setSecret($this->generateCrypt($data['password']));
+        $user->key_enc = Str::random(32);
+        $user->save();
+        return $user;
+        //send a (encrypted with recovery server pubkey) packet containing user id and $key_crypt
+        //openssl_public_encrypt($data, $encrypted, $pubKey);
+        //guzzle client, send to remote server
     }
+
+    /**
+     * Generate the key_crypt.
+     *
+     * @param  string  $password
+     * @return binary string
+     */
+    protected function generateCrypt($password)
+    {
+        return hash('sha256', $password.config('app.secret'), true);
+    }
+
 }
