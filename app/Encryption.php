@@ -23,6 +23,8 @@ trait Encryption
     public function setSecret($cryptkey)
     {
     	$this->secret = $cryptkey;
+
+        return $this;
     }
 
     /**
