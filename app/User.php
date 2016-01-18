@@ -14,7 +14,7 @@ class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
                                     CanResetPasswordContract
 {
-    use Authenticatable, Authorizable, CanResetPassword;
+    use Authenticatable, Authorizable, CanResetPassword, Encryption;
 
     /**
      * The database table used by the model.
@@ -29,6 +29,13 @@ class User extends Model implements AuthenticatableContract,
      * @var array
      */
     protected $fillable = ['f_name', 'l_name', 'email', 'password'];
+
+    /**
+     * The attributes that are encrypted.
+     *
+     * @var array
+     */
+    protected $encrypted = ['key_enc', 'signkeyname_enc'];
 
     /**
      * The attributes excluded from the model's JSON form.
