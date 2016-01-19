@@ -12,11 +12,12 @@
 namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use XmlDSig;
 use App\Http\Controllers\Controller;
 use UCrypt;
+use Cache;
+use Auth;
 use App\Crypted;
 
 /**
@@ -54,36 +55,78 @@ class SignatureTestController extends Controller
      */
     public function blobSign()
     {
-        //test encryption
-        $crypted = new Crypted;
-        $crypted->setSecret('oQdZj2fbSZKbk4ggMLLwP0BmG86wHgCy');
-        $crypted->testval = 'lickmebitch';
-        $crypted->testcryptval = $crypted->testval;
-        $crypted->save();
-        $crypt_id = $crypted->getKey();
-        //test decryiption
-        $cryptrecord = Crypted::find($crypt_id);
-        $cryptrecord->setSecret('oQdZj2fbSZKbk4ggMLLwP0BmG86wHgCy');
-        $resultss = [
-        'testval'=> $cryptrecord->testval,
-        'encryptedval'=> $cryptrecord->testcryptval,
-        ];
-        var_dump($resultss);
+        dd(Cache::get(Auth::user()->id, 'no value bitch'));
+        // $data = 'startedfromthebottomnowwerehere';
+        // $key = openssl_pkey_get_public(file_get_contents(storage_path('keys').'\serverpublic.pem'));
+        // openssl_public_encrypt($data, $encrypted, $key);
+        // $privkey = openssl_pkey_get_private(file_get_contents(storage_path('keys').'\serverprivate.pem'));
+        // openssl_private_decrypt($encrypted, $decrypted, $privkey);
+        // $resultss = [
+        // 'testval'=> $data,
+        // 'encryptedval'=> base64_encode($encrypted),
+        // 'decryptedval'=> $decrypted
+        // ];
+        
+        // var_dump($resultss);
 
-        // Ucrypt::setKey('0tu4c0vaJ1cvSNtu7SLr3eIfmVfOfBuB');
+        // $config = array(
+        // "private_key_bits" => 4096,
+        // "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        // );
+        // $private1 = openssl_pkey_new($config);
+
+        // // openssl_pkey_export($private2, $readableprivate);
+        // // var_dump($readableprivate);
+        // $details = openssl_pkey_get_details($private1);
+        // $public1 = $details['key'];
+        // openssl_pkey_export_to_file($private1, storage_path('keys').'\serv1erprivate.pem');
+        // file_put_contents(storage_path('keys').'\serv1erpublic.pem', $public1);
+        // $myfile = fopen(storage_path('keys').'\tstkeys.txt', 'w');
+        // fwrite($myfile, "id:,rsaenckey:sometext,\n");
+        // fwrite($myfile, "id:,rsaenckey:sometext2,\n");
+        // fclose($myfile);
+        // die('I die with success')
+        // var_dump($private1);
+        // var_dump($public1);
+        // $secretkey = openssl_dh_compute_key($public2, $private1);
+        // var_dump($secretkey);
+        // die();
+        //var_dump(Auth::user());
+        // $request = ['password'=>'uhfnkjsnf'];
+        // dd($request->only('password')['email'] = Auth::user()->email);
+        // test encryption
+        // $crypted = new Crypted;
+        // $crypted->setSecret('oQdZj2fbSZKbk4ggMLLwP0BmG86wHgCy');
+        // $crypted->testval = "sixjuf8idaracter";
+        // $crypted->testcryptval = $crypted->testval;
+        // $crypted->save();
+        // $crypt_id = $crypted->getKey();
+        // //test decryption
+        // $cryptrecord = Crypted::find($crypt_id)->setSecret();
+        // $resultss = [
+        // 'testval'=> $cryptrecord->testval,
+        // 'encryptedval'=> $cryptrecord->testcryptval,
+        // ];
+        // var_dump($resultss);
+        // die();
+
+        // Ucrypt::setKey(hash('sha256','anything',true));
         // $plaintextval = 'encryptmebitch';
         // $encryptedval = UCrypt::encrypt($plaintextval);
         // try {
+        //     Ucrypt::setKey(hash('sha256','anything',true));
         //     $decryptedval = UCrypt::decrypt($encryptedval);
         // } catch (Exception $e) {
-        //     $decryptedval = 'fail';
+        //     $decryptedval = 'faill';
         // }
         // $resultss = [
         // 'plaintextval'=> $plaintextval,
         // 'encryptedval'=> $encryptedval,
-        // 'decryptedval'=> $decryptedval
+        // 'decryptedval'=> $decryptedval,
+        // 'hash' => hash('sha256', $decryptedval.config('app.secret'))
         // ];
         // var_dump($resultss);
+
     //     $client = new Client();
     //  $response = $client->post('https://api.blockcypher.com/v1/bcy/test/addrs', [
     //         'token' => '0ca04b9e7819100572b03eb19ed5fd0c',
