@@ -15,12 +15,12 @@ trait Encryption
     protected $secret;
 
     /**
-     * Set the encryption key.
+     * Set the encryption key, nulls if nothing is passed
      *
      * @param  string  $cryptkey
      * @return void
      */
-    public function setSecret($cryptkey)
+    public function setSecret($cryptkey = null)
     {
     	$this->secret = $cryptkey;
 
@@ -33,11 +33,14 @@ trait Encryption
      * @param  string  $key
      * @return boolean
      */
-    protected function satisfiesConditions($key)
+    protected function satisfiesConditions($key, $method = 'set')
     {
     	if (array_key_exists($key, array_flip($this->encrypted))) {
-            if (!is_null($this->secret)) {
+            if (strlen($this->secret)==32) {
                 return true;
+            }
+            elseif (is_null($this->secret) && $method = 'get') {
+                return false;
             }
             else {
                 throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
@@ -54,7 +57,7 @@ trait Encryption
      */
     public function getAttribute($key)
     {
-        if ($this->satisfiesConditions($key))
+        if ($this->satisfiesConditions($key, 'get'))
         {
             UCrypt::setKey($this->secret);
             return UCrypt::decrypt(parent::getAttribute($key));
@@ -72,7 +75,7 @@ trait Encryption
      */
     public function setAttribute($key, $value)
     {
-        if ($this->satisfiesConditions($key))
+        if ($this->satisfiesConditions($key, 'set'))
         {
         	UCrypt::setKey($this->secret);
             parent::setAttribute($key, UCrypt::encrypt($value));
