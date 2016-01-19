@@ -133,13 +133,17 @@ class AuthController extends Controller
             'password' => bcrypt($data['password']),
         ]);
         //create and store user key (auto encrypted)
+        $user_key = Str::random(32);
         $user->setSecret($this->generateCrypt($data['password']));
-        $user->key_enc = Str::random(32);
+        $user->key_enc = $user_key;
         $user->save();
+        //encrypt user_key with servel pubkey and store
+        $serverpubkey = openssl_pkey_get_public(file_get_contents(storage_path('keys').'\serverpublic.pem'));
+        openssl_public_encrypt($user_key, $encrypted, $serverpubkey);
+        $rsaenckeyfile = fopen(storage_path('keys').'\userkeys.txt', 'a');
+        fwrite($rsaenckeyfile, $user->id.','.base64_encode($encrypted)."\n");
+        fclose($rsaenckeyfile);
         return $user;
-        //send a (encrypted with recovery server pubkey) packet containing user id and $key_crypt
-        //openssl_public_encrypt($data, $encrypted, $pubKey);
-        //guzzle client, send to remote server
     }
 
     /**
