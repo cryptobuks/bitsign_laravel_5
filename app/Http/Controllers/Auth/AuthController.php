@@ -6,10 +6,12 @@ use App\User;
 use Validator;
 use Socialite;
 use Auth;
+use Cache;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -144,6 +146,24 @@ class AuthController extends Controller
         fwrite($rsaenckeyfile, $user->id.','.base64_encode($encrypted)."\n");
         fclose($rsaenckeyfile);
         return $user;
+    }
+
+    /**
+     * Decrypt and cache the user's encryption key.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\User $user
+     * @return \Illuminate\Http\Response
+     */
+    protected function authenticated(Request $request, User $user)
+    {
+        //generate key_crypt and set secret
+        $user->setSecret($this->generateCrypt($request->password));
+        $unencryptedkey = $user->key_enc;
+        //set minutes here
+        $minutes = 25;
+        Cache::add($user->id, $unencryptedkey, $minutes);
+        return redirect()->intended($this->redirectPath());
     }
 
     /**
