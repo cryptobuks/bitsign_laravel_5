@@ -115,7 +115,7 @@ class AuthController extends Controller
             'f_name' => 'required|alpha|max:50',
             'l_name' => 'required|alpha|max:50',
             'password' => 'required|confirmed|min:6',
-            'agree' => 'accepted',
+            'terms' => 'accepted',
         ]);
     }
 
