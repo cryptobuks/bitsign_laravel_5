@@ -39,7 +39,7 @@
 				</form>
 				<br>
 			    <!-- The container for the uploaded files -->
-			    <div id="files" class="files"></div>
+			    <div id="files"></div>
 			    <br>
 			    <div class="next button">
 					<div class="col-sm-2">
@@ -63,10 +63,10 @@ $(function () {
         dataType: 'json',
         done: function (e, data) {
             $.each(data._response.result.files, function (index, filename) {
-                $('<p/>').text(filename).appendTo('#files');
+                $( '#files' ).append( "<p class=\"success\" style=\"color:green\">"+String(filename)+"</p>" );
             });
             $.each(data._response.result.errors, function (index, error) {
-                $('<p/>').text(error).appendTo('#files');
+                $( '#files' ).append( "<p class=\"error\" style=\"color:red\">"+String(error)+"</p>" );
             });
         }
     });

@@ -34,7 +34,7 @@
 					<div class="form-group">
 						<label class="col-sm-2 control-label" for="contract_title">Contract Title:</label>
 						<div class="col-sm-10">
-								<input type="text" class="form-control" name="contract_title" id="contract_title"/>
+								<input type="text" class="form-control" id="contract_title"/>
 						</div>
 					</div>
 					<div class="clearfix"></div>
