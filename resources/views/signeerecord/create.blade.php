@@ -77,10 +77,10 @@ $(function () {
             },
             function(data){
             	if(data['exists']==1) {
-					$('<p/>').text('Signee '+data['name']+data['message']+data['email']+')').appendTo('#added_signees');
+					$('#added_signees').append("<p style=\"color:green\">"+String('Signee '+data['name']+data['message']+data['email']+')')+'</p>');
 				}
 				else if(data['exists']==0) {
-					$('<p/>').text(data['message']+data['email']).appendTo('#added_signees');
+					$('#added_signees').append("<p style=\"color:orange\">"+String(data['message']+data['email'])+'</p>');
 				}
             },
             'json'
