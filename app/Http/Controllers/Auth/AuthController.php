@@ -103,6 +103,19 @@ class AuthController extends Controller
     }
 
     /**
+     * Log the user out of the application.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getLogout()
+    {
+        Cache::forget(Auth::user()->id);
+        Auth::logout();
+
+        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+    }
+
+    /**
      * Get a validator for an incoming registration request.
      *
      * @param  array  $data
@@ -160,9 +173,7 @@ class AuthController extends Controller
         //generate key_crypt and set secret
         $user->setSecret($this->generateCrypt($request->password));
         $unencryptedkey = $user->key_enc;
-        //set minutes here
-        $minutes = 25;
-        Cache::add($user->id, $unencryptedkey, $minutes);
+        Cache::forever($user->id, $unencryptedkey);
         return redirect()->intended($this->redirectPath());
     }
 
