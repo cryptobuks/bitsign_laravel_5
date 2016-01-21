@@ -6,13 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class Contract extends Model
 {
+    use Encryption;
     /**
 	 * The parts of the users table that are fillable.
 	 *
 	 * @var array
 	 */
 
-	protected $fillable = ['title','content','creator_id', 'type'];
+	protected $fillable = ['title','content', 'type'];
+
+    /**
+     * The attributes that are encrypted.
+     *
+     * @var array
+     */
+    protected $encrypted = ['title', 'content'];
 
 	/**
      * Get the user that owns the contract.

@@ -7,6 +7,7 @@ use App\Contract;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
+use Cache;
 
 class ContractController extends Controller
 {	
@@ -68,6 +69,7 @@ class ContractController extends Controller
 	{
 		
 		$this->validate($request, [
+			//if increasing the max size, also increase database
         'contract_title' => 'required|unique:contracts,title|max:40',
         'contract_content' => 'required',
         'contract_type' => 'exists:contracttypes,id',
@@ -81,6 +83,7 @@ class ContractController extends Controller
 
         // store in database
         $contract = new Contract;
+        $contract->setSecret(Cache::get(Auth::user()->id));
         $contract->title = $contract_title;
         $contract->content = $contract_content;
         $contract->user_id = $creator_id;

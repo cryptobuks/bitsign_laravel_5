@@ -153,9 +153,9 @@ class AuthController extends Controller
         $user->key_enc = $user_key;
         $user->save();
         //encrypt user_key with servel pubkey and store
-        $serverpubkey = openssl_pkey_get_public(file_get_contents(storage_path('keys').'\serverpublic.pem'));
+        $serverpubkey = openssl_pkey_get_public(file_get_contents(storage_path('keys').'/serverpublic.pem'));
         openssl_public_encrypt($user_key, $encrypted, $serverpubkey);
-        $rsaenckeyfile = fopen(storage_path('keys').'\userkeys.txt', 'a');
+        $rsaenckeyfile = fopen(storage_path('keys').'/userkeys.txt', 'a');
         fwrite($rsaenckeyfile, $user->id.','.base64_encode($encrypted)."\n");
         fclose($rsaenckeyfile);
         return $user;
