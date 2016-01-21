@@ -12,10 +12,13 @@ class CreateContractsTable extends Migration {
 	 */
 	public function up()
 	{
+		if (Schema::hasTable('contracts')) {
+            Schema::drop('contracts');
+        }
 		Schema::create('contracts', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('title',40);
+			$table->string('title',276);
 			$table->longText('content');
 			$table->timestamps();
 			$table->integer('user_id')->length(10)->unsigned()->index();
