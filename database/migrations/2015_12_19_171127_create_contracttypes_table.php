@@ -15,6 +15,7 @@ class CreateContracttypesTable extends Migration
         Schema::create('contracttypes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('contract_type',30);
+            $table->string('template',30);
         });
     }
 

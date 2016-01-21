@@ -11,9 +11,17 @@ class ContractTypesTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('contracttypes')->insert([
-            'id' => 1,
-            'contract_type' => 'default',
-        ]);
+        $records = [
+        [1, 'default'],
+        [2, 'intellectual_property_record']
+        ];
+
+        foreach ($records as $record) {
+            DB::table('contracttypes')->insert([
+            'id' => $record[0],
+            'contract_type' => $record[1],
+            ]);
+        }
+        
     }
 }
