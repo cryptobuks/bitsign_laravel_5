@@ -20,9 +20,10 @@ class CreateContractsTable extends Migration {
 			$table->increments('id');
 			$table->string('title',276);
 			$table->longText('content');
-			$table->timestamps();
 			$table->integer('user_id')->length(10)->unsigned()->index();
 			$table->integer('type')->length(2);
+			$table->string('key',244);
+			$table->timestamps();
 		});
 	}
 
