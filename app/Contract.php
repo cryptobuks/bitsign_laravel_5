@@ -20,7 +20,7 @@ class Contract extends Model
      *
      * @var array
      */
-    protected $encrypted = ['title', 'content'];
+    protected $encrypted = ['title', 'content', 'key'];
 
 	/**
      * Get the user that owns the contract.

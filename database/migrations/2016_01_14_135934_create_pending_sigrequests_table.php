@@ -14,8 +14,10 @@ class CreatePendingSigrequestsTable extends Migration
     {
         Schema::create('pending_sigrequests', function(Blueprint $table)
         {
+            $table->increments('id');
             $table->integer('contract_id')->length(12)->unsigned()->index();
             $table->integer('pending_user_id')->length(12)->unsigned()->index();
+            $table->string('key_enc', 244);
             $table->timestamps();
         });
     }
