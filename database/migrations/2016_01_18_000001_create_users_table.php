@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('password', 60);
             $table->string('key_enc', 244);
             $table->string('signkeyname_enc', 244);
+            $table->string('pubkey', 32);
             $table->rememberToken();
             $table->timestamps();
         });

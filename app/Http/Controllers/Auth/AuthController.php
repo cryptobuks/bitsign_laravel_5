@@ -158,6 +158,12 @@ class AuthController extends Controller
         $rsaenckeyfile = fopen(storage_path('keys').'/userkeys.txt', 'a');
         fwrite($rsaenckeyfile, $user->id.','.base64_encode($encrypted)."\n");
         fclose($rsaenckeyfile);
+        //generate the signing keypair
+        $filenames = $this->generateKeypair($user_key);
+        $user->setSecret($user_key);
+        $user->signkeyname_enc = $filenames['privkey'];
+        $user->pubkey = $filenames['pubkey'];
+        $user->save();
         return $user;
     }
 
@@ -185,7 +191,28 @@ class AuthController extends Controller
      */
     protected function generateCrypt($password)
     {
-        return hash('sha256', $password.config('app.secret'), true);
+        return hash('sha256', $password.config('app.key'), true);
+    }
+
+    /**
+     * Generate and store an ECDSA keypair.
+     *
+     * @return string $filename
+     */
+    protected function generateKeypair($passphrase)
+    {
+        $config = array(
+        "private_key_bits" => 4096,
+        "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        );
+        $privatekey = openssl_pkey_new($config);
+        $details = openssl_pkey_get_details($privatekey);
+        $publickey = $details['key'];
+        $privfilename = Str::random(32);
+        $pubfilename = Str::random(32);
+        openssl_pkey_export_to_file($privatekey, storage_path('keys').'/'.$privfilename.'.pem', $passphrase);
+        file_put_contents(storage_path('keys').'/'.$pubfilename.'.pem', $publickey);
+        return ['privkey'=>$privfilename, 'pubkey' => $pubfilename];
     }
 
 }
