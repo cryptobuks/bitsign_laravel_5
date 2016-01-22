@@ -17,7 +17,9 @@ class CreateFileRecordsTable extends Migration {
 			$table->increments('id');
 			$table->char('hash', 64);
 			$table->string('filename', 100);
+			$table->string('salt', 10);
 			$table->integer('contract_id')->length(14)->unsigned()->index();
+			$table->boolean('encrypted');
 			$table->timestamps();
 		});
 	}

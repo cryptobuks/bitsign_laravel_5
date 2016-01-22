@@ -7,6 +7,9 @@ use App\FileRecord;
 use App\Contract;
 use Validator;
 use Auth;
+use Storage;
+use Cache;
+use UCrypt;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -52,10 +55,12 @@ class FileRecordController extends Controller
 		//instantiate arrays
 		$errors = array();
 	    $files = array();
+	    //get the current contact
+	    $contract = Contract::find($contract_id);
 
 		//Check whether this contract belongs to this user
 
-		if (Contract::find($contract_id)->user_id != Auth::user()->id){
+		if ($contract->user_id != Auth::user()->id){
 			$errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
 			return array(
 				'files' => $files,
@@ -63,8 +68,12 @@ class FileRecordController extends Controller
 	    	);
 		}
 
+		//get the contract key
+		$contract->setSecret(Cache::get(Auth::user()->id));
+		$contract_key = $contract->key;
+
 		//Set the upload parameters
-		$assetPath = '/uploads';
+		$assetPath = 'uploads';
 		$uploadPath = storage_path($assetPath);
 
 		//Get files from POST Input
@@ -100,12 +109,17 @@ class FileRecordController extends Controller
 				 		$errors[] = 'File ' . $upload->getClientOriginalName() . ' has already been added to this contract';
 				 	}
 				 	else{
+				 		//encrypt
+				 		$unencryptedfile = Storage::get($assetPath.'/'.$filename);
+				 		UCrypt::setKey($contract_key);
+				 		Storage::put($assetPath.'/'.$filename, UCrypt::encrypt($unencryptedfile));
 				 		// store in database
 				        $filerecord = new FileRecord;
 				        $filerecord->hash = $shafile;
 				        $filerecord->filename = $original_name;
 				        $filerecord->salt = $salt;
 				        $filerecord->contract_id = $contract_id;
+				        $filerecord->encrypted = true;
 				        $filerecord->save();
 						$files[] = 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile ;
 				 	}
