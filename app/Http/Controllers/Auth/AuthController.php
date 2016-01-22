@@ -8,7 +8,7 @@ use Socialite;
 use Auth;
 use Cache;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Str;
+
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 use Illuminate\Http\Request;
@@ -148,7 +148,7 @@ class AuthController extends Controller
             'password' => bcrypt($data['password']),
         ]);
         //create and store user key (auto encrypted)
-        $user_key = Str::random(32);
+        $user_key = str_random(32);
         $user->setSecret($this->generateCrypt($data['password']));
         $user->key_enc = $user_key;
         $user->save();
@@ -208,8 +208,8 @@ class AuthController extends Controller
         $privatekey = openssl_pkey_new($config);
         $details = openssl_pkey_get_details($privatekey);
         $publickey = $details['key'];
-        $privfilename = Str::random(32);
-        $pubfilename = Str::random(32);
+        $privfilename = str_random(32);
+        $pubfilename = str_random(32);
         openssl_pkey_export_to_file($privatekey, storage_path('keys').'/'.$privfilename.'.pem', $passphrase);
         file_put_contents(storage_path('keys').'/'.$pubfilename.'.pem', $publickey);
         return ['privkey'=>$privfilename, 'pubkey' => $pubfilename];
