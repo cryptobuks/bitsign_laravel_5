@@ -88,6 +88,7 @@ class ContractController extends Controller
         $contract->content = $contract_content;
         $contract->user_id = $creator_id;
         $contract->type = $request->contract_type;
+        $contract->key = str_random(32);
         $contract->save();
         $contract_id = $contract->getKey();
  
