@@ -84,19 +84,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Shared Secret
-    |--------------------------------------------------------------------------
-    |
-    | This key is used with the user password to decrypt the user_key and
-    | should be set to a random, 32 character string, otherwise the user_key
-    | will not be safe. Please do this before deploying an application,
-    | and also set the same key on the recovery server
-    */
-
-    'secret' => env('SHARED_SECRET', 'SomeRandom32charString'),
-
-    /*
-    |--------------------------------------------------------------------------
     | Logging Configuration
     |--------------------------------------------------------------------------
     |
