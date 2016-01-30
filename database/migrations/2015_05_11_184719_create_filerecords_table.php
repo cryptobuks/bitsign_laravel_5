@@ -12,6 +12,9 @@ class CreateFileRecordsTable extends Migration {
 	 */
 	public function up()
 	{
+		if (Schema::hasTable('filerecords')) {
+            Schema::drop('filerecords');
+        }
 		Schema::create('file_records', function(Blueprint $table)
 		{
 			$table->increments('id');
@@ -19,6 +22,7 @@ class CreateFileRecordsTable extends Migration {
 			$table->string('filename', 100);
 			$table->string('salt', 10);
 			$table->integer('contract_id')->length(14)->unsigned()->index();
+			$table->string('type', 40);
 			$table->boolean('encrypted');
 			$table->timestamps();
 		});
