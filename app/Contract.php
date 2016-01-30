@@ -57,4 +57,13 @@ class Contract extends Model
     {
         return $this->hasMany(PendingSigrequest::class);
     }
+
+    /**
+     * Get this contract's type.
+     */
+
+    public function contracttype()
+    {
+        return $this->belongsTo(ContractType::class);
+    }
 }

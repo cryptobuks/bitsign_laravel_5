@@ -17,9 +17,9 @@ class ContractTypesTableSeeder extends Seeder
         ];
 
         foreach ($records as $record) {
-            DB::table('contracttypes')->insert([
+            DB::table('contract_types')->insert([
             'id' => $record[0],
-            'contract_type' => $record[1],
+            'name' => $record[1],
             ]);
         }
         
