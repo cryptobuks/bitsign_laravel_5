@@ -85,6 +85,7 @@ class FileRecordController extends Controller
 		//Set the upload parameters
 		$assetPath = 'uploads';
 		$uploadPath = storage_path($assetPath);
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 
 		//Get files from POST Input
 		$all_uploads = $request->file('files'); // your file upload input field in the form should be named 'files' or 'files[]'
@@ -131,6 +132,7 @@ class FileRecordController extends Controller
 				        $filerecord->filename = $original_name;
 				        $filerecord->salt = $salt;
 				        $filerecord->contract_id = $contract_id;
+				        $filerecord->type = finfo_file($finfo, $uploadPath.'/'.$filename);
 				        $filerecord->encrypted = true;
 				        $filerecord->save();
 						$files[] = 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile ;
