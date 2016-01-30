@@ -12,9 +12,12 @@ class CreateContracttypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('contracttypes', function (Blueprint $table) {
+        if (Schema::hasTable('contract_types')) {
+            Schema::drop('contract_types');
+        }
+        Schema::create('contract_types', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('contract_type',30);
+            $table->string('name',30);
         });
     }
 
@@ -25,6 +28,6 @@ class CreateContracttypesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('contracttypes');
+        Schema::drop('contract_types');
     }
 }

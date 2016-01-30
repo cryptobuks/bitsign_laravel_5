@@ -72,7 +72,7 @@ class ContractController extends Controller
 			//if increasing the max size, also increase database
         'contract_title' => 'required|unique:contracts,title|max:40',
         'contract_content' => 'required',
-        'contract_type' => 'exists:contracttypes,id',
+        'contract_type' => 'exists:contract_types,id',
     	]);
 
 		// get input
@@ -87,7 +87,7 @@ class ContractController extends Controller
         $contract->title = $contract_title;
         $contract->content = $contract_content;
         $contract->user_id = $creator_id;
-        $contract->type = $request->contract_type;
+        $contract->contracttype_id = $request->contract_type;
         $contract->key = str_random(32);
         $contract->save();
         $contract_id = $contract->getKey();
