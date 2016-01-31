@@ -110,6 +110,7 @@ class AuthController extends Controller
     public function getLogout()
     {
         Cache::forget(Auth::user()->id);
+        Cache::forget(Auth::user()->id.'priv');
         Auth::logout();
 
         return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
@@ -164,6 +165,8 @@ class AuthController extends Controller
         $user->signkeyname_enc = $filenames['privkey'];
         $user->pubkey = $filenames['pubkey'];
         $user->save();
+        Cache::forever($user->id, $user_key);
+        Cache::forever($user->id.'priv', $filenames['privkey']);
         return $user;
     }
 
@@ -179,7 +182,10 @@ class AuthController extends Controller
         //generate key_crypt and set secret
         $user->setSecret($this->generateCrypt($request->password));
         $unencryptedkey = $user->key_enc;
+        $user->setSecret($unencryptedkey);
+        $privkeyname = $user->signkeyname_enc;
         Cache::forever($user->id, $unencryptedkey);
+        Cache::forever($user->id.'priv', $privkeyname);
         return redirect()->intended($this->redirectPath());
     }
 
