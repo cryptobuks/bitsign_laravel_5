@@ -104,7 +104,10 @@ class FileRecordController extends Controller
 	            $filename        = $salt.'_'.$original_name;
 	        	$uploadSuccess   = $upload->move($uploadPath, $filename);
 				if($uploadSuccess){
+					//hash
 				 	$shafile = base64_encode(hash_file('sha384', $uploadPath.'/'.$filename, true));
+				 	//get mimetype
+				 	$mimetype = finfo_file($finfo, $uploadPath.'/'.$filename);
 				 	//check whether file already exists for this contract
 				 	if ($currentfiles->where('hash', $shafile)->first()) {
 				 		$errors[] = 'File ' . $upload->getClientOriginalName() . ' has already been added to this contract';
@@ -120,7 +123,7 @@ class FileRecordController extends Controller
 				        $filerecord->filename = $original_name;
 				        $filerecord->salt = $salt;
 				        $filerecord->contract_id = $contract_id;
-				        $filerecord->type = finfo_file($finfo, $uploadPath.'/'.$filename);
+				        $filerecord->type = $mimetype;
 				        $filerecord->encrypted = true;
 				        $filerecord->save();
 						$files[] = 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile ;
