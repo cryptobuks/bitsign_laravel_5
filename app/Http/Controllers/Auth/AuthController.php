@@ -152,6 +152,7 @@ class AuthController extends Controller
         $user_key = str_random(32);
         $user->setSecret($this->generateCrypt($data['password']));
         $user->key_enc = $user_key;
+        //var_dump($user->key_enc);
         $user->save();
         //encrypt user_key with servel pubkey and store
         $serverpubkey = openssl_pkey_get_public(file_get_contents(storage_path('keys').'/serverpublic.pem'));
@@ -165,6 +166,10 @@ class AuthController extends Controller
         $user->signkeyname_enc = $filenames['privkey'];
         $user->pubkey = $filenames['pubkey'];
         $user->save();
+        // $user->setSecret($this->generateCrypt($data['password']));
+        // var_dump($user->key_enc);
+        // $user->setSecret($user_key);
+        // dd($user->signkeyname_enc);
         Cache::forever($user->id, $user_key);
         Cache::forever($user->id.'priv', $filenames['privkey']);
         return $user;
