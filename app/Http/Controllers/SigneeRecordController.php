@@ -78,6 +78,8 @@ class SigneeRecordController extends Controller
                 $signeerecord->contract_id = $contract->id;
                 $signeerecord->user_id = $signee->id;
                 $signeerecord->contractkey_enc = base64_encode($encryptedcc);
+                $signeerecord->status = 0;
+                $signeerecord->term = 'default';
                 $signeerecord->save();
                 //respond with JSON of user data
                 return response()->json(['exists' => 1, 'name' => $signee->f_name.' '.$signee->l_name, 'email' => $usr_email, 'message'=>' successfully added to this contract (']);

@@ -12,6 +12,9 @@ class CreateSignaturesTable extends Migration {
 	 */
 	public function up()
 	{
+		if (Schema::hasTable('signatures')) {
+            Schema::drop('signatures');
+        }
 		Schema::create('signatures', function(Blueprint $table)
 		{
 			$table->increments('id');
@@ -19,6 +22,8 @@ class CreateSignaturesTable extends Migration {
 			$table->integer('user_id')->length(12)->unsigned()->index();
 			$table->string('contractkey_enc', 684);
 			$table->string('signed_hash', 684);
+			$table->string('term', 40);
+			$table->boolean('status');
 			$table->timestamps();
 		});
 	}
