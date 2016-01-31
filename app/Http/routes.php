@@ -28,6 +28,10 @@ Route::get('auth/callback/{provider}', 'Auth\AuthController@handleProviderCallba
 Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::post('auth/register', 'Auth\AuthController@postRegister');
 
+//Add Address
+Route::get('addaddress', 'Auth\AuthController@getAddAddress');
+Route::post('addaddress', 'Auth\AuthController@postAddAddress');
+
 /*Routing for Contracts Controller*/
 
 Route::resource('contracts', 'ContractController', 
