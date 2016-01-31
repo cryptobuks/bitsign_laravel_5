@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\User;
+use App\Address;
 use Validator;
 use Socialite;
 use Auth;
@@ -28,7 +29,7 @@ class AuthController extends Controller
 
     use AuthenticatesAndRegistersUsers, ThrottlesLogins;
 
-    protected $redirectPath = 'dashboard';
+    protected $redirectPath = 'addaddress';
 
     /**
      * Create a new authentication controller instance.
@@ -37,7 +38,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('guest', ['except' => 'getLogout']);
+        $this->middleware('guest', ['except' => ['getLogout', 'getAddAddress', 'postAddAddress']]);
     }
 
     /**
@@ -114,6 +115,50 @@ class AuthController extends Controller
         Auth::logout();
 
         return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+    }
+
+    /**
+     * Add an address to the account.
+     *
+     * @return view
+     */
+    public function getAddAddress()
+    {
+        if (is_null(Auth::user()->address)) {
+            return view('auth.addaddress');
+        }
+        return redirect('dashboard');
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function postAddAddress(Request $request)
+    {
+        $this->validate($request, [
+            //if increasing the max size, also increase database
+        'line_1' => 'required|max:120',
+        'line_2' => 'required|max:120',
+        'city' => 'required|max:100',
+        'country' => 'required|max:50',
+        'state' => 'required|max:50',
+        'postalcode' => 'required|max:16',
+        ]);
+
+        $address = new Address;
+        $address->line_1 = $request->line_1;
+        $address->line_2 = $request->line_2;
+        $address->city = $request->city;
+        $address->country = $request->country;
+        $address->state = $request->state;
+        $address->postalcode = $request->postalcode;
+        $address->line_2 = $request->line_2;
+        $address->user_id = Auth::user()->id;
+        $address->save();
+
+        return redirect('dashboard');
     }
 
     /**

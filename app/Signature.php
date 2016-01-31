@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Signature extends Model
 {
-    protected $fillable = ['contract_id','user_id'];
+    protected $fillable = [];
 
     /**
      * Get the contract that this signature belongs to.

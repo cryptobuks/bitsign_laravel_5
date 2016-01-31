@@ -59,4 +59,12 @@ class User extends Model implements AuthenticatableContract,
     {
         return $this->hasMany(Signature::class);
     }
+
+    /**
+     * Get the user's adress.
+     */
+    public function address()
+    {
+        return $this->hasOne(Address::class);
+    }
 }
