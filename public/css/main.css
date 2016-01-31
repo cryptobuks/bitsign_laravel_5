@@ -184,7 +184,7 @@ pre code {
   background-color: lightgray;
   padding-bottom: 10%;
 }
-.login-form , .signup-form {
+.login-form , .signup-form , .address-form{
   border-radius: 5px;
   background: cadetblue;
   padding: 5% 0 10% 0;
