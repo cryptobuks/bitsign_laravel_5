@@ -199,9 +199,9 @@ class AuthController extends Controller
         $user->key_enc = $user_key;
         $user->save();
         //encrypt user_key with servel pubkey and store
-        $serverpubkey = openssl_pkey_get_public(file_get_contents(storage_path('keys').'/serverpublic.pem'));
+        $serverpubkey = openssl_pkey_get_public(file_get_contents(base_path('resources/keys').'/serverpublic.pem'));
         openssl_public_encrypt($user_key, $encrypted, $serverpubkey);
-        $rsaenckeyfile = fopen(storage_path('keys').'/userkeys.txt', 'a');
+        $rsaenckeyfile = fopen(base_path('resources/keys').'/userkeys.txt', 'a');
         fwrite($rsaenckeyfile, $user->id.','.base64_encode($encrypted)."\n");
         fclose($rsaenckeyfile);
         //generate the signing keypair
@@ -263,7 +263,24 @@ class AuthController extends Controller
         $pubfilename = str_random(32);
         openssl_pkey_export_to_file($privatekey, storage_path('keys').'/'.$privfilename.'.pem', $passphrase);
         file_put_contents(storage_path('keys').'/'.$pubfilename.'.pem', $publickey);
+        $this->generatePublicXML($details['rsa'], $pubfilename);
         return ['privkey'=>$privfilename, 'pubkey' => $pubfilename];
+    }
+
+    protected function generatePublicXML($rsa, $filename)
+    {
+        $xml = new \SimpleXMLElement("<RSAKeyValue/>"); // Use <RSAKeyPair/> for XKMS 2.0
+
+        // .Net / XKMS openssl RSA indecies to XML element names mappings
+        $map = ["n"    => "Modulus", "e"    => "Exponent"];
+
+        foreach ($map as $key => $element) {
+            $xml->addChild($element, base64_encode($rsa[$key]));
+        }
+        //export to file
+        $xmlString = $xml->asXML();
+        $xmlString = str_replace("<?xml version=\"1.0\"?>\n", '', $xmlString);
+        file_put_contents(storage_path('keys/').$filename.'.xml', $xmlString);
     }
 
 }
