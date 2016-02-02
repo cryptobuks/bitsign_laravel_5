@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE contract SYSTEM
+eContracts-Reference.dtd>
+<contract xmlns="urn:oasis:names:tc:eContracts:1:0"
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:xi="http://www.w3.org/2001/XInclude">
+<metadata>
+<conditions><condition name="US">United States</condition></conditions>
+<dc:title>WIU CS Department notice 001</dc:title>
+<dc:creator>Julie Sasa</dc:creator>
+<dc:contributor>Keith Wallen</dc:contributor>
+<dc:subject>Scope of licence</dc:subject>
+<dc:publisher>WIU</dc:publisher>
+<!-- <dc:date>2005-09-20</dc:date> -->
+<dc:rights>Copyright, Elkera Pty Limited, 2005</dc:rights>
+</metadata>
+<title><text>Sample of
+- attachments
+- attachment
+- title
+- block
+- text
+</text></title>
+<subtitle>This file is to test : - title - sub-title - contract-front -
+date-block - parties - party - body - back -
+attachments - attachment
+</subtitle>
+<contract-front>
+<date-block>
+<date><em>Long time ago</em></date>
+</date-block>
+<parties><title><text>Parties</text></title>
+<party><person-record><name>ABC Ventures Limited</name> having
+its office at <address>100 Main Street, Sydney, NSW 2000</address>
+</person-record>, hereafter referred to as
+"<term>General Partner</term>"
+</party>
+<party><person-record><name>John A. Doe</name> of
+<address>10 Ramrod Drive, Sydney, NSW 2000</address></person-record>
+and <person-record><name>John W. Smith</name> of
+<address>25 Pine Road, Plainsville, NSW, 0000</address>
+</person-record>, herafter collectively referred to as
+"Limited Partners"
+</party>
+</parties>
+</contract-front>
+<body>
+<item>
+<block>
+<definition>
+<terms><term>You</term> or <term>Your</term></terms>
+<block>
+<text>means an individual or entity exercising rights under this Licence.
+</text>
+</block>
+</definition>
+</block>
+</item>
+<item number="2.1">
+<block number-type="none">
+<text>BNML Standard consists of 6 BNML specific files and
+2 files that incorporate external
+features into the application.
+The bnml-standard is the main file which includes all of the
+other files:</text>
+<inclusion class="code-listing">
+<block number-type="none">
+<text>/BNML Standard</text>
+<item>
+<block number-type="none">
+<text>/RelaxNG</text>
+<item>
+<block>
+<text>bnml-standard.rnc</text>
+<text>bnml-document.rnc</text>
+<text>bnml-contract.rnc</text>
+<text>bnml-correspondence.rnc</text>
+<text>bnml-core.rnc</text>
+<text>bnml-structure.rnc</text>
+<text>dc-metadata.rnc</text>
+<text>xi-include.rnc</text>
+</block>
+</item>
+</block>
+</item>
+</block>
+</inclusion>
+<inclusion class="example">
+<block>
+<text>
+<phrase class="code">bnml-s-application name.rnc</phrase>
+</text>
+</block>
+</inclusion>
+</block>
+</item>
+<item>
+<block>
+<text>The location to deliver <em>the item</em>
+<strike>has to be one of <statutory-em>designated
+terminals.</statutory-em></strike> will be any places.</text>
+</block>
+<block>
+<text>The location to deliver <em>the item</em>
+<strike>has to be one of <statutory-em>designated
+terminals.</statutory-em></strike> will be any places.</text>
+</block>
+</item>
+<xi:include href="Inventry01.xml">
+<xi:fallback>
+<xi:include href="Acct.xml">
+<xi:fallback>This is the fallback of Acct.xml.</xi:fallback>
+</xi:include>
+</xi:fallback>
+</xi:include>
+<xi:include href="Terminal.xml"/>
+<block condition="jurisdiction-US">
+<text>A United States - specific term in the contract</text>
+</block>
+<block condition="jurisdiction-AU">
+<text>An Australia-specific statement in the contract</text>
+</block>
+<block condition="jurisdiction-AU jurisdiction-US">
+<text> This block will be included if either value is true.</text>
+</block>
+</body>
+<attachments>
+<attachment class="appendix" id="a1" number="15">
+<title><text>Form of notice in Schema files</text></title>
+<block><text>They must be sent regular mail.</text></block>
+<block><text>Standard Schema
+<reference href="http://www.elkera.com" print-url="true">
+can be read on the web easily!</reference>.</text></block>
+</attachment>
+</attachments>
+<back>
+<party-signature>
+<signatory-group>
+<block> </block>
+<signatory-record>
+<signatory id="T0001" xml:lang="ja">
+<signature-line id="I0001" xml:lang="en_US">
+<text>Mr. Signatory Jr.</text>
+<field>Field for a text.</field>
+</signature-line>
+</signatory>
+<witness>
+<signature-line id="I0002" xml:lang="fr">
+<text>Ms. Witness Arcole</text>
+<field>Field for a text.</field>
+</signature-line>
+</witness>
+</signatory-record>
+</signatory-group>
+</party-signature>
+</back>
+</contract>
