@@ -136,6 +136,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Iwalpola\XmlDigitalSignature\XmlDigitalSignatureServiceProvider::class,
 
         /*
          * Application Service Providers...
