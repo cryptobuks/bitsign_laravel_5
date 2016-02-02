@@ -277,7 +277,7 @@ class SignatureController extends Controller
     {
         //load xml from template
         $doc = new \DOMDocument;
-        $doc->load(storage_path('xmltemplates/legalxml/').$data['contracttype'].'.xml');
+        $doc->load(base_path('resources/xmltemplates/').$data['contracttype'].'.xml');
         //set title
         $doc_title = $doc->getElementById('title');
         $doc_title->nodeValue = $data['title'];
