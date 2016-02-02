@@ -83,7 +83,7 @@ class FileRecordController extends Controller
 		}
 		
 		//Set the upload parameters
-		$assetPath = 'uploads';
+		$assetPath = 'contracts/'.$contract_id.'/files';
 		$uploadPath = storage_path($assetPath);
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 
