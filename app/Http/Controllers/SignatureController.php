@@ -10,6 +10,7 @@ use App\Contract;
 use App\User;
 use UCrypt;
 use Cache;
+use XmlDSig;
 
 class SignatureController extends Controller
 {
@@ -63,20 +64,22 @@ class SignatureController extends Controller
      */
     public function store(Request $request)
     {
-        
-        $user_id = Auth::user()->id;
-        $signeevalidity = $this->isInContract($user_id, $request->contract_id);
-        if ($this->noKey($user_id)) {
-            return response()->json(['success' => 3]);
+        $contract = Contract::find($request->contract_id);
+        $user = Auth::user();
+        $signeevalidity = $this->isInContract($user->id,$contract);
+        if (is_null($user->signkeyname_enc)) {
+            return response()->json(['success' => 3, 'message' => 'We don\'t have a valid key file in your name.']);
         }
-        if ($signeevalidity=='complete') {
-            return response()->json(['success' => 2]);
+        if ($signeevalidity==='complete') {
+            return response()->json(['success' => 2, 'message' => 'You have already signed this Contract']);
         }
-        if ($signeevalidity) {
-            $this->signIt($contract_id);
-            return response()->json(['success' => 1]);
+        if ($signeevalidity===true) {
+            $this->signIt($user, $contract);
+            return response()->json(['success' => 1, 'message' => 'Successfully Signed']);
         }
-        else {return response()->json(['success' => 0]);}
+        else {
+            return response()->json(['success' => 0, 'message' => 'You are not in this Contract']);
+        }
     }
 
     /**
@@ -96,39 +99,69 @@ class SignatureController extends Controller
      * @param  int  $contract_id
      * @return null
      */
-    protected function signIt($contract_id)
+    protected function signIt(User $user, Contract $contract)
     {
         //set XMLDigitalSignature options
         XmlDSig::setCryptoAlgorithm(1);
         XmlDSig::setDigestMethod('sha512');
         XmlDSig::forceStandalone();
         //load the private key
+        $privkeypass = Cache::get($user->id);
+        $privname = Cache::get($user->id.'priv');
+        $pubname = $user->pubkey;
         try
         {
-            XmlDSig::loadPrivateKey(storage_path('keys/private.pem'), 'MrMarchello');
-            XmlDSig::loadPublicKey(storage_path('keys/public.pem'));
-            XmlDSig::loadPublicXmlKey(storage_path('keys/public.xml'));
+            XmlDSig::loadPrivateKey(storage_path('keys/'.$privname.'.pem'), $privkeypass);
+            XmlDSig::loadPublicKey(storage_path('keys/'.$pubname.'.pem'));
+            XmlDSig::loadPublicXmlKey(storage_path('keys/'.$pubname.'.xml'));
         }
         catch (\UnexpectedValueException $e)
         {
             print_r($e);
             exit(1);
         }
-        //check key in cache
-        //if none, login again
-        //if key exists, decode the privatekey to memory
-        //check document existence, if not, create
-    }
-
-    /**
-     * Check if the user has a private keyfile
-     *
-     * @param  int user_id
-     * @return boolean
-     */
-    protected function noKey(User $user)
-    {
-        return is_null($user->signkeyname_enc);
+        //get signature
+        $sigrecord = $contract->signatures->where('user_id',$user->id)->first();
+        //load priate key to memory
+        $privkeymem =  openssl_pkey_get_private(
+                file_get_contents(storage_path('keys/').$privname.'.pem'),
+                $privkeypass
+            );
+        //get contract key
+        $pubenc_contractkey = $sigrecord->contractkey_enc;
+        openssl_private_decrypt(
+            base64_decode($pubenc_contractkey),
+            $dcrypted_contractkey,
+            $privkeymem
+        );
+        //check document existence
+        $filepath = storage_path('contracts/').$contract->id.'/contract.xml';
+        if (file_exists($filepath)) {
+            //decrypt the contract XML
+            $encrypteddata = file_get_contents($filepath);
+            UCrypt::setKey($dcrypted_contractkey);
+            $decrypteddata = UCrypt::decrypt($encrypteddata);
+            $econtract = new \DOMDocument;
+            $econtract->loadXML($decrypteddata);
+            $signdata = $econtract->getElementsByTagName('contract')[0];
+            try{
+                XmlDSig::addObject($signdata, 'contractcontent', true);
+                XmlDSig::sign();
+                XmlDSig::verify();
+            }
+            catch (\UnexpectedValueException $e){
+                print_r($e);
+                exit(1);
+            }
+            //set signature filepath, and write to file
+            $sigfpath = storage_path('contracts/'.$contract->id.'/dsig_').$user->f_name.'_'.$user->l_name.'.xml';
+            file_put_contents($sigfpath, XmlDSig::getSignedDocument());
+            //hash that thang
+            $sha384 = hash('sha384', file_get_contents($sigfpath));
+            $sigrecord->hash = $sha384;
+            $sigrecord->status = true;
+            $sigrecord->save();
+        }
     }
 
     /**
@@ -138,11 +171,10 @@ class SignatureController extends Controller
      * @param  int  $contract_id
      * @return boolean or string 'complete'
      */
-    protected function isInContract($user_id, $contract_id)
+    protected function isInContract($user_id, Contract $contract)
     {
-        $signee = Contract::find($contract_id)->signatures->where('user_id',$user_id);
-        if ($signee) {
-            if ($signee->status==0) {
+        if ($signee = $contract->signatures->where('user_id',$user_id)->first()) {
+            if ($signee->status==false) {
                 return true;
             }
             return 'complete';
