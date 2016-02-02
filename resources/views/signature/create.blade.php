@@ -73,7 +73,7 @@
 					</div>
 				</div>
 				<br>
-				<form id="sign" action="sign" method="POST">
+				<form id="sign-form" action="sign" method="POST">
 					<br>
 					<input type="hidden" value="<?php echo csrf_token(); ?>" name="_token"></input>
 				    <input type="hidden" value="{{$contract_data['id']}}" name="contract_id"></input>
@@ -83,26 +83,29 @@
 							</button>
 				</form>
 				<br><br>
+				<div id="messages"></div>
 			</div>
 		</div>
 	</div>
 </div>
 <script>
 $(function () {
-    $('#fileupload').fileupload({
-        dataType: 'json',
-        done: function (e, data) {
-            $.each(data._response.result.files, function (index, filename) {
-                $( '#files' ).append( "<p class=\"success\" style=\"color:green\">"+String(filename)+"</p>" );
-            });
-            $.each(data._response.result.errors, function (index, error) {
-                $( '#files' ).append( "<p class=\"error\" style=\"color:red\">"+String(error)+"</p>" );
-            });
-        }
-    });
-    $("#btnNext").click(function(){
-    	var ajax_url = 'signeerecord/' + '{{$contract_data['id']}}';
-		LoadAjaxContent(ajax_url);
-    });
+    $('#sign-form').on('submit', function(){ 
+                 
+   // ajax post method to pass form data to the server
+	        $.post(
+	            $(this).prop('action'),
+	            {
+	                "_token": $( this ).find( 'input[name=_token]' ).val(),
+	                "contract_id": $( this ).find( 'input[name=contract_id]' ).val()
+	            },
+	            function(data){
+	            	$( '#messages' ).append( "<p class=\"success\" style=\"color:green\">"+data['message']+"</p>" );
+	            },
+	            'json'
+	        ); 
+	       
+	        return false;
+	    });
 });
 </script>
