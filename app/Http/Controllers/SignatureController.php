@@ -164,9 +164,9 @@ class SignatureController extends Controller
         //get the contract decryption key
         if ($contract->user_id != $auth_user_id) {
             $pkeyname = Cache::get($auth_user_id.'priv').'.pem';
-            $pubenc_contractkey = $contract->signatures->where('user_id',$auth_user_id)->contractkey_enc;
+            $pubenc_contractkey = $contract->signatures->where('user_id',$auth_user_id)->first()->contractkey_enc;
             openssl_private_decrypt(
-                $pubenc_contractkey,
+                base64_decode($pubenc_contractkey),
                 $dcrypted_contractkey,
                 openssl_pkey_get_private(
                     file_get_contents(storage_path('keys').'/'.$pkeyname),
