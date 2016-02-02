@@ -84,7 +84,7 @@ class ContractController extends Controller
         $contract_key = str_random(32);
         // store in database
         $contract = new Contract;
-        $contract->setSecret(Cache::get(Auth::user()->id));
+        $contract->setSecret(Cache::get($creator_id));
         $contract->user_id = $creator_id;
         $contract->contracttype_id = $request->contract_type;
         $contract->key = $contract_key;
