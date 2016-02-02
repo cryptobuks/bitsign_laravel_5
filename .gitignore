@@ -5,3 +5,4 @@ Homestead.json
 .env
 storage/contracts/
 storage/keys/
+composer.lock
