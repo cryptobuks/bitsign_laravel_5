@@ -185,7 +185,7 @@ class SignatureController extends Controller
         $data['title'] = $contract->title;
         $data['body'] = $contract->content;
         $filerecords = $contract->filerecords;
-        $data['name'] = $contract->contracttype->name;
+        $data['contracttype'] = $contract->contracttype->name;
         $data['key'] = $dcrypted_contractkey;
         $signatures = $contract->signatures;
         //arrange the signing individuals into parties and fill in $data
@@ -245,7 +245,7 @@ class SignatureController extends Controller
     {
         //load xml from template
         $doc = new \DOMDocument;
-        $doc->load(storage_path('xmltemplates/legalxml/').$data['name'].'.xml');
+        $doc->load(storage_path('xmltemplates/legalxml/').$data['contracttype'].'.xml');
         //set title
         $doc_title = $doc->getElementById('title');
         $doc_title->nodeValue = $data['title'];
