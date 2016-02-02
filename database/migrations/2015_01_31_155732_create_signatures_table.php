@@ -21,7 +21,7 @@ class CreateSignaturesTable extends Migration {
 			$table->integer('contract_id')->length(12)->unsigned()->index();
 			$table->integer('user_id')->length(12)->unsigned()->index();
 			$table->string('contractkey_enc', 684);
-			$table->string('signed_hash', 684);
+			$table->string('hash', 64);
 			$table->string('term', 40);
 			$table->boolean('status');
 			$table->timestamps();
