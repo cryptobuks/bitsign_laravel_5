@@ -91,6 +91,8 @@ class ContractController extends Controller
         $contract->save();
         $contract_id = $contract->getKey();
         //save the encrypted stuff
+        //new object
+        $contract = Contract::find($contract_id);
         $contract->setSecret($contract_key);
         $contract->title = $contract_title;
         $contract->content = $contract_content;
