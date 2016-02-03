@@ -149,7 +149,12 @@ function LoadAjaxContent(url){
 			$('.preloader').hide();
 		},
 		error: function (jqXHR, textStatus, errorThrown) {
-			alert(errorThrown);
+			console.log(errorThrown);
+		},
+		statusCode: {
+		    401: function() {
+		      $(location).attr("href", 'auth/login');
+		    }
 		},
 		dataType: "html"
 	});
