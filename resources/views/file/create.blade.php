@@ -32,22 +32,24 @@
 			<div class="box-content">
 				<form id="fileupload" action="file" method="POST" enctype="multipart/form-data">
 					<h4 class="page-header">Add files that you want to be part of this record</h4>
-					<br>
+					<div></div>
 					<input type="file" name="files[]" multiple>
-					<input type="hidden" value="<?php echo csrf_token(); ?>" name="_token"></input>
-				    <input type="hidden" value="{{$contract_id}}" name="contract_id"></input>
+					<input type="hidden" value="<?php echo csrf_token(); ?>" name="_token">
+				    <input type="hidden" value="{{$contract_id}}" name="contract_id">
 				</form>
 				<br>
 			    <!-- The container for the uploaded files -->
 			    <div id="files"></div>
 			    <br>
-			    <div class="next button">
-					<div class="col-sm-2">
-						<button id="btnNext" class="btn btn-primary btn-label-left btn-block">
-						<span><i class="fa fa-save"></i></span>
-							Save and Proceed
+			    <div class="nav-buttons">
+						<button id="btnPrev" class="col-sm-2 btn btn-primary pull-left">
+							<span style="padding-right:8px"><i class="fa fa-arrow-left"></i></span>
+							Previous Step
 						</button>
-					</div>
+						<button style="margin-left:16px" id="btnNext" class="col-sm-2 btn btn-primary">
+							Save and Proceed
+							<span style="padding-left:8px"><i class="fa fa-arrow-right"></i></span>
+						</button>
 				</div>
 				<br><br>
 			</div>
@@ -72,6 +74,10 @@ $(function () {
     });
     $("#btnNext").click(function(){
     	var ajax_url = 'signeerecord/' + '{{$contract_id}}';
+		LoadAjaxContent(ajax_url);
+    });
+    $("#btnPrev").click(function(){
+    	var ajax_url = 'contracts/' + '{{$contract_id}}' +'/edit';
 		LoadAjaxContent(ajax_url);
     });
 });

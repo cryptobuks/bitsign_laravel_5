@@ -30,11 +30,11 @@
 			</div>
 			<div class="box-content">
 				<h4 class="page-header">New Contract</h4>
-				<form class="form-horizontal" role="form" method="post" action="contracts" id="form-add-a-contract">
+				<form class="form-horizontal" role="form" method="post" action="{{$posturl}}" id="form-add-a-contract">
 					<div class="form-group">
 						<label class="col-sm-2 control-label" for="contract_title">Contract Title:</label>
 						<div class="col-sm-10">
-								<input type="text" class="form-control" id="contract_title"/>
+								<input type="text" @if(isset($data)) value="{{$data['title']}}" @endif class="form-control" id="contract_title"/>
 						</div>
 					</div>
 					<div class="clearfix"></div>
@@ -42,7 +42,7 @@
 
 						<!--<label class="col-sm-2 control-label" for="form-styles">Textarea</label>-->
 						<div class="col-sm-12">
-								<textarea class="form-control" rows="15" name="contract_content" id="wysiwig_simple"></textarea>
+								<textarea class="form-control" rows="15" name="contract_content" id="wysiwig_simple">@if(isset($data)) {{$data['content']}} @endif</textarea>
 						</div>
 					</div>
 					<div class="form-group">
