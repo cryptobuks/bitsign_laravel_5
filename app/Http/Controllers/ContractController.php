@@ -57,7 +57,7 @@ class ContractController extends Controller
 	public function create()
 	{
 		//returns the TinyMCE Editor
-		return view('contracts.create');
+		return view('contracts.create')->withPosturl('contracts');
 	}
 
 	/**
@@ -73,6 +73,27 @@ class ContractController extends Controller
 	}
 
 	/**
+	 * Return the form for updating the resource.
+	 * GET /contracts/{id}/edit
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function edit($id)
+	{
+		//contract data
+		$contract = Contract::find($id);
+		$auth_user_id = Auth::user()->id;
+		if ($contract->user_id!=$auth_user_id){
+			abort(422);
+		}
+		Ucrypt::setKey(Cache::get($auth_user_id));
+		Ucrypt::setKey(Ucrypt::decrypt($contract->key));
+		$data = array('title' => Ucrypt::decrypt($contract->title), 'content' => Ucrypt::decrypt($contract->content));
+		return view('contracts.create')->withData($data)->withPosturl('contracts/'.$contract->id);
+	}
+
+	/**
 	 * Show the form for editing the specified resource.
 	 * GET /contracts/{id}/edit
 	 *
@@ -82,7 +103,6 @@ class ContractController extends Controller
 	
 	public function store(Request $request)
 	{
-		
 		$this->validate($request, [
 			//if increasing the max size, also increase database
         'contract_title' => 'required|unique:contracts,title|max:40',
@@ -92,7 +112,6 @@ class ContractController extends Controller
 
 		// get input
  		$creator_id = Auth::user()->id;
- 		$name = $request->name;
         $contract_title = $request->contract_title;
         $contract_content = $request->contract_content;
 
@@ -122,16 +141,42 @@ class ContractController extends Controller
 	}
 
 	/**
-	 * Update the specified resource in storage.
-	 * PUT /contracts/{id}
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $this->validate($request, [
+			//if increasing the max size, also increase database
+        'contract_title' => 'required|unique:contracts,title|max:40',
+        'contract_content' => 'required',
+        'contract_type' => 'exists:contract_types,id',
+    	]);
+
+		// get input
+ 		$creator_id = Auth::user()->id;
+        $contract_title = $request->contract_title;
+        $contract_content = $request->contract_content;
+        
+        //save the encrypted stuff
+        //new object
+        $contract = Contract::find($id);
+        UCrypt::setKey(Cache::get($creator_id));
+        $contract->setSecret(UCrypt::decrypt($contract->key));
+        $contract->title = $request->contract_title;
+        $contract->content = $request->contract_content;
+        $contract->save();
+ 
+        $response = array(
+            'status' => 'success',
+            'contract_id' => $id
+        );
+ 
+        return response()->json( $response );
+    }
 
 	/**
 	 * Remove the specified resource from storage.
