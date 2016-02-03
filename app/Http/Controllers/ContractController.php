@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
 use Cache;
+use UCrypt;
 
 class ContractController extends Controller
 {	
@@ -31,8 +32,21 @@ class ContractController extends Controller
 	public function index()
 	{
 		$user = Auth::user();
+		$secret = Cache::get($user->id);
+		$contracts_raw = $user->contracts;
+		foreach ($contracts_raw as $key => $contract) {
+			UCrypt::setKey($secret);
+			$contract_key = Ucrypt::decrypt($contract->key);
+			UCrypt::setKey($contract_key);
+			$contracts[$key] = [
+			'id' => $contract->id,
+			'title'=> Ucrypt::decrypt($contract->title),
+			'type' => $contract->contracttype->name,
+			'created_at' => $contract->created_at
+			];
+		}
 		//returns the fetched contracts index
-		return view('contracts.index')->withContracts($user->contracts)->withSecret(Cache::get($user->id));
+		return view('contracts.index')->withContracts($contracts);
 	}
 
 	/**

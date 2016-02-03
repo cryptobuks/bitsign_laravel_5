@@ -42,16 +42,11 @@
 					</thead>
 					<tbody>
 						@foreach($contracts as $key=>$contract)
-						<?php
-						$contract->setSecret($secret);
-						$contract_key = $contract->key;
-						$contract->setSecret($contract_key);
-						?>
 						<tr>
 							<td>{{$key + 1}}</td>
-							<td>{{$contract->title}}</td>
-							<td>{{$contract->contracttype->name}}</td>
-							<td>{{$contract->created_at}}</td>
+							<td>{{$contract['title']}}</td>
+							<td>{{$contract['type']}}</td>
+							<td>{{$contract['created_at']}}</td>
 							<td>Edit</td>
 							<td>Send for Signing</td>
 						</tr>
