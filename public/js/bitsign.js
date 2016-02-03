@@ -151,8 +151,7 @@ function LoadAjaxContent(url){
 		error: function (jqXHR, textStatus, errorThrown) {
 			alert(errorThrown);
 		},
-		dataType: "html",
-		async: false
+		dataType: "html"
 	});
 }
 //
