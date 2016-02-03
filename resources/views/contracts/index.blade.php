@@ -33,7 +33,7 @@
 					<thead>
 						<tr>
 							<th>Select</th>
-							<th>Contract Name</th>
+							<th>Contract Title</th>
 							<th>Type</th>
 							<th>Date Last modified</th>
 							<th>Edit</th>
@@ -41,37 +41,26 @@
 						</tr>
 					</thead>
 					<tbody>
-					<!-- Start: list_row -->
+						@foreach($contracts as $key=>$contract)
+						<?php
+						$contract->setSecret($secret);
+						$contract_key = $contract->key;
+						$contract->setSecret($contract_key);
+						?>
 						<tr>
-							<td>1</td>
-							<td>Subletting Agreement</td>
-							<td>Property Agreement</td>
-							<td>11/12/2015</td>
-							<td>Edit Now</td>
-							<td>Create Signature</td>
+							<td>{{$key + 1}}</td>
+							<td>{{$contract->title}}</td>
+							<td>{{$contract->contracttype->name}}</td>
+							<td>{{$contract->created_at}}</td>
+							<td>Edit</td>
+							<td>Send for Signing</td>
 						</tr>
-						<tr>
-							<td>2</td>
-							<td>Apache Software License</td>
-							<td>License</td>
-							<td>09/03/2015</td>
-							<td>Edit Now</td>
-							<td>Create Signature</td>
-						</tr>
-						<tr>
-							<td>3</td>
-							<td>Inventor's Patent License</td>
-							<td>License</td>
-							<td>02/01/2015</td>
-							<td>Edit Now</td>
-							<td>Create Signature</td>
-						</tr>
-					<!-- End: list_row -->
+						@endforeach
 					</tbody>
 					<tfoot>
 						<tr>
 							<th>Select</th>
-							<th>Contract Name</th>
+							<th>Contract Title</th>
 							<th>Type</th>
 							<th>Date Last modified</th>
 							<th>Edit</th>
