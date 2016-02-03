@@ -30,8 +30,9 @@ class ContractController extends Controller
 	 */
 	public function index()
 	{
+		$user = Auth::user();
 		//returns the fetched contracts index
-		return view('contracts.index');
+		return view('contracts.index')->withContracts($user->contracts)->withSecret(Cache::get($user->id));
 	}
 
 	/**
