@@ -152,7 +152,7 @@ class ContractController extends Controller
     {
         $this->validate($request, [
 			//if increasing the max size, also increase database
-        'contract_title' => 'required|unique:contracts,title|max:40',
+        'contract_title' => 'required|max:40',
         'contract_content' => 'required',
         'contract_type' => 'exists:contract_types,id',
     	]);
@@ -167,11 +167,13 @@ class ContractController extends Controller
         $contract = Contract::find($id);
         UCrypt::setKey(Cache::get($creator_id));
         $contract->setSecret(UCrypt::decrypt($contract->key));
-        $contract->title = $request->contract_title;
-        $contract->content = $request->contract_content;
-        $contract->hash = '';
-        $contract->save();
- 
+        if ($contract->title != $contract_title || $contract->content != $contract_content) {
+        	$contract->title = $contract_title;
+	        $contract->content = $contract_content;
+	        $contract->hash = '';
+	        $contract->save();
+        }
+
         $response = array(
             'status' => 'success',
             'contract_id' => $id
