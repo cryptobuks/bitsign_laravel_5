@@ -43,6 +43,13 @@ class SigneeRecordController extends Controller
         'subheading3' => 'Add Signees'
         );
 
+        if ($sigs = Contract::find($id)->signatures) {
+            foreach ($sigs as $sig) {
+                $signee = $sig->user;
+                $data['signeerecords'][] = ['name'=>$signee->f_name.' '.$signee->l_name, 'email'=>$signee->email];
+            }
+        }
+
         //returns an uploader page
         return view('signeerecord.create', $data);
     }
