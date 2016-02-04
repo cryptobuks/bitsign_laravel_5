@@ -47,7 +47,7 @@
 							<td>{{$contract['title']}}</td>
 							<td>{{$contract['type']}}</td>
 							<td>{{$contract['created_at']}}</td>
-							<td>Edit</td>
+							<td><a class="ajax-link" href="contracts/{{$contract['id']}}/edit">Edit</a></td>
 							<td>Send for Signing</td>
 						</tr>
 						@endforeach
@@ -83,7 +83,17 @@ function MakeSelect2(){
 $(document).ready(function() {
 	// Load Datatables and run plugin on tables 
 	LoadDataTablesScripts(AllTables);
-	// Add Drag-n-Drop feature
-	WinMove();
+});
+$('.box-content').find('a.ajax-link').click(function (e){
+	e.preventDefault();
+	if ($(this).hasClass('add-full')) {
+		$('#content').addClass('full-content');
+	}
+	else {
+		$('#content').removeClass('full-content');
+	}
+	var url = $(this).attr('href');
+	window.location.hash = url;
+	LoadAjaxContent(url);
 });
 </script>
