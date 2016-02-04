@@ -59,6 +59,8 @@ class SigneeRecordController extends Controller
 
         //set data to variable
         $contract = Contract::find($request->contract_id);
+        $contract->hash = '';
+        $contract->save();
         //fetch contract key
         $auth_user = Auth::user();
         $contract->setSecret(Cache::get($auth_user->id));

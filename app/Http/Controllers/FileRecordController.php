@@ -64,6 +64,8 @@ class FileRecordController extends Controller
 	    $files = array();
 	    //get the current contact
 	    $contract = Contract::find($contract_id);
+	    $contract->hash = '';
+	    $contract->save();
 
 		//Check whether this contract belongs to this user
 
@@ -104,7 +106,7 @@ class FileRecordController extends Controller
 	    // Loop through all uploaded files
 	    foreach ($all_uploads as $upload) {
 
-	    	$currentfiles = Contract::find($contract_id)->filerecords();
+	    	$currentfiles = $contract->filerecords();
 		 	if ($currentfiles->count() >= 10) {
 		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed tits!)';
 		 		Log::warning('Showing error array for case1: '.$errors[0]);

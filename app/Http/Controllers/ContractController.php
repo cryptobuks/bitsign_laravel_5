@@ -31,6 +31,7 @@ class ContractController extends Controller
 	 */
 	public function index()
 	{
+		$contracts = array();
 		$user = Auth::user();
 		$secret = Cache::get($user->id);
 		$contracts_raw = $user->contracts;
@@ -168,6 +169,7 @@ class ContractController extends Controller
         $contract->setSecret(UCrypt::decrypt($contract->key));
         $contract->title = $request->contract_title;
         $contract->content = $request->contract_content;
+        $contract->hash = '';
         $contract->save();
  
         $response = array(

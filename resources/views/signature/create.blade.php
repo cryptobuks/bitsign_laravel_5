@@ -77,11 +77,17 @@
 					<br>
 					<input type="hidden" value="<?php echo csrf_token(); ?>" name="_token"></input>
 				    <input type="hidden" value="{{$contract_data['id']}}" name="contract_id"></input>
-				    <button type="submit" class="btn btn-primary btn-label-left btn-block">
-							<span><i class="fa fa-save"></i></span>
-								Sign this Contract
-							</button>
 				</form>
+				<div class="nav-buttons">
+						<button id="btnPrev" class="col-sm-2 btn btn-primary pull-left">
+							<span style="padding-right:8px"><i class="fa fa-arrow-left"></i></span>
+							Previous Step
+						</button>
+						<button style="margin-left:16px" id="btnSign" class="col-sm-2 btn btn-primary">
+							Sign this document
+							<span style="padding-left:8px"><i class="fa fa-arrow-right"></i></span>
+						</button>
+				</div>
 				<br><br>
 				<div id="messages"></div>
 			</div>
@@ -90,22 +96,24 @@
 </div>
 <script>
 $(function () {
-    $('#sign-form').on('submit', function(){ 
-                 
-   // ajax post method to pass form data to the server
-	        $.post(
-	            $(this).prop('action'),
-	            {
-	                "_token": $( this ).find( 'input[name=_token]' ).val(),
-	                "contract_id": $( this ).find( 'input[name=contract_id]' ).val()
-	            },
-	            function(data){
-	            	$( '#messages' ).append( "<p class=\"success\" style=\"color:green\">"+data['message']+"</p>" );
-	            },
-	            'json'
-	        ); 
-	       
-	        return false;
-	    });
+	//navigation buttons
+    $("#btnSign").click(function(){
+    	$.post(
+            $('#sign-form').prop('action'),
+            {
+                "_token": $('#sign-form').find( 'input[name=_token]' ).val(),
+                "contract_id": $('#sign-form').find( 'input[name=contract_id]' ).val()
+            },
+            function(data){
+            	$( '#messages' ).append( "<p class=\"success\" style=\"color:green\">"+data['message']+"</p>" );
+            },
+            'json'
+        );
+        return false;
+    });
+    $("#btnPrev").click(function(){
+    	var ajax_url = 'signeerecord/' + '{{$contract_data['id']}}';
+		LoadAjaxContent(ajax_url);
+    });
 });
 </script>

@@ -237,33 +237,32 @@ class SignatureController extends Controller
             # code...
         }
         //build doc if legalXML not built
-        if (strlen($contract->hash)==0) {
+        if (strlen($contract->hash)==0 || !file_exists($filepath)) {
             $buildreturn = $this->assembleDoc($data, $filepath);
             $contract->hash = $buildreturn[0];
             $data['date'] = $buildreturn[1];
             $contract->save();
         }
         else{
+            UCrypt::setKey($dcrypted_contractkey);
+            $decryptedfile = UCrypt::decrypt(file_get_contents($filepath));
             //get date
             $contractdoc = new \DOMDocument;
-            $contractdoc->load($filepath);
+            $contractdoc->loadXML($decryptedfile);
             $data['date'] = $contractdoc->getElementsByTagName('date')[0]->nodeValue;
         }
-        //if document exists, confirm hash, else rebuild
-        if (file_exists($filepath)) {
-            //set key
-            UCrypt::setKey($dcrypted_contractkey);
-            //get encrypted data
-            $encrypteddata = file_get_contents($filepath);
-            //decrypt
-            $filedata = UCrypt::decrypt($encrypteddata);
-            //check hash and return
-            if (base64_encode(hash('sha384',$filedata,true))==$contract->hash) {
-                $data['hash'] = $contract->hash; 
-            }
-            else{
-                abort(422);
-            }
+        //set key
+        UCrypt::setKey($dcrypted_contractkey);
+        //get encrypted data
+        $encrypteddata = file_get_contents($filepath);
+        //decrypt
+        $filedata = UCrypt::decrypt($encrypteddata);
+        //check hash and return
+        if (base64_encode(hash('sha384',$filedata,true))==$contract->hash) {
+            $data['hash'] = $contract->hash; 
+        }
+        else{
+            abort(422);
         }
         return $data;
     }
