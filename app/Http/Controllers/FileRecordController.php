@@ -43,6 +43,12 @@ class FileRecordController extends Controller
     	'subheading3' => 'Attach Files'
 		);
 
+		if ($frecords_raw = Contract::find($id)->filerecords) {
+			foreach ($frecords_raw as $filerecord) {
+				$data['filerecords'][] = ['filename'=>$filerecord->filename, 'hash'=>$filerecord->hash];
+			}
+		}
+		
 		//returns an uploader page
 		return view('file.create', $data);
 	}

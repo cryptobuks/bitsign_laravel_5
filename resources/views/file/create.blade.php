@@ -39,7 +39,13 @@
 				</form>
 				<br>
 			    <!-- The container for the uploaded files -->
-			    <div id="files"></div>
+			    <div id="files">
+			    	@if(isset($filerecords))
+			    	@foreach($filerecords as $filerecord)
+			    	<p class="success" style="color:green">File {{$filerecord['filename']}} successfully added as hash value: {{$filerecord['hash']}}</p>
+			    	@endforeach
+			    	@endif
+			    </div>
 			    <br>
 			    <div class="nav-buttons">
 						<button id="btnPrev" class="col-sm-2 btn btn-primary pull-left">
