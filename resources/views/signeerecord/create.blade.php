@@ -47,15 +47,23 @@
 					<input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
 					<input type="hidden" name="contract_id" value="{{$contract_id}}">
 				</form>
-				<div id="added_signees" class="added_signees"></div>
+				<div id="added_signees" class="added_signees">
+					@if(isset($signeerecords))
+			    	@foreach($signeerecords as $signeerecord)
+			    	<p class="success" style="color:green">Signee {{$signeerecord['name']}} successfully added to this contract ({{$signeerecord['email']}})</p>
+			    	@endforeach
+			    	@endif
+				</div>
 				<br>
-				<div class="next button">
-					<div class="col-sm-2">
-						<button id="btnNext" class="btn btn-primary btn-label-left btn-block">
-						<span><i class="fa fa-save"></i></span>
-							Save and Proceed
+				<div class="nav-buttons">
+						<button id="btnPrev" class="col-sm-2 btn btn-primary pull-left">
+							<span style="padding-right:8px"><i class="fa fa-arrow-left"></i></span>
+							Previous Step
 						</button>
-					</div>
+						<button style="margin-left:16px" id="btnNext" class="col-sm-2 btn btn-primary">
+							Save and Proceed
+							<span style="padding-left:8px"><i class="fa fa-arrow-right"></i></span>
+						</button>
 				</div>
 				<br><br>
 			</div>
@@ -88,9 +96,13 @@ $(function () {
        
         return false;
 	});
-	//next page
+	//navigation buttons
     $("#btnNext").click(function(){
     	var ajax_url = 'sign/' + '{{$contract_id}}';
+		LoadAjaxContent(ajax_url);
+    });
+    $("#btnPrev").click(function(){
+    	var ajax_url = 'file/' + '{{$contract_id}}';
 		LoadAjaxContent(ajax_url);
     });
 });
