@@ -44,7 +44,7 @@ class FileRecordController extends Controller
 
 		if ($frecords_raw = Contract::find($id)->filerecords) {
 			foreach ($frecords_raw as $filerecord) {
-				$data['filerecords'][] = ['filename'=>$filerecord->filename, 'hash'=>$filerecord->hash];
+				$data['filerecords'][] = ['filename'=>$filerecord->filename, 'hash'=>$filerecord->hash, 'id'=>$filerecord->id];
 			}
 		}
 		
@@ -152,7 +152,9 @@ class FileRecordController extends Controller
 				        $currentfilecount++;
 				        $files[] = array(
 				        	'filename' => $upload->getClientOriginalName(),
-				        	'message' => 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile
+				        	'hash' => $shafile,
+				        	'message' => 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile,
+				        	'id' => $filerecord->getKey()
 				        	);
 				 	}
 				} 
@@ -205,10 +207,6 @@ class FileRecordController extends Controller
 		}
 
 		$filerecord->delete();
-		return array(
-				'files' => $files,
-	        	'errors' => $errors,
-	        	'deleted' => 1
-	    	);
+		return response()->json(array('deleted' => $id));
 	}
 }
