@@ -102,9 +102,14 @@ class FileRecordController extends Controller
 	    if (!is_array($all_uploads)) {
 	        $all_uploads = array($all_uploads);
 	    }
-
-	    $currentfiles = $contract->filerecords();
+	    //get info about current filerecords
+	    $currentfiles = $contract->filerecords;
 	    $currentfilecount = $currentfiles->count();
+	    $currentfilehashes = array();
+
+	    foreach ($currentfiles as $key => $curfile) {
+	    	$currentfilehashes[$key] = $curfile->hash;
+	    }
 
 	    // Loop through all uploaded files
 	    foreach ($all_uploads as $upload) {
@@ -130,7 +135,7 @@ class FileRecordController extends Controller
 				 	//get mimetype
 				 	$mimetype = finfo_file($finfo, $uploadPath.'/'.$filename);
 				 	//check whether file already exists for this contract
-				 	if ($currentfiles->where('hash', $shafile)->first()) {
+				 	if (array_search($shafile, $currentfilehashes) !== false) {
 				 		$errors[] = 'File ' . $upload->getClientOriginalName() . ' has already been added to this contract';
 				 		Log::warning('Showing error array for case1: '.$errors[0]);
 				 	}
