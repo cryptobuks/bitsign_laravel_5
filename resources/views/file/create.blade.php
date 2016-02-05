@@ -69,6 +69,7 @@
 $(function () {
     $('#fileupload').fileupload({
         dataType: 'json',
+        multiFileRequest: true,
         done: function (e, data) {
             $.each(data._response.result.files, function (index, filename) {
                 $( '#files' ).append( "<p class=\"success\" style=\"color:green\">"+String(filename)+"</p>" );
