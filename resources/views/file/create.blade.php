@@ -32,20 +32,20 @@
 			<div class="box-content">
 				<form id="fileupload" action="file" method="POST" enctype="multipart/form-data">
 					<h4 class="page-header">Add files that you want to be part of this record</h4>
-					<div></div>
 					<input type="file" name="files[]" multiple>
-					<input type="hidden" value="<?php echo csrf_token(); ?>" name="_token">
-				    <input type="hidden" value="{{$contract_id}}" name="contract_id">
-				</form>
-				<br>
-			    <!-- The container for the uploaded files -->
-			    <div id="files">
+					<div id="files">
 			    	@if(isset($filerecords))
 			    	@foreach($filerecords as $filerecord)
 			    	<p class="success" style="color:green">File {{$filerecord['filename']}} successfully added as hash value: {{$filerecord['hash']}}</p>
 			    	@endforeach
 			    	@endif
-			    </div>
+			    	</div>
+					<input type="hidden" value="<?php echo csrf_token(); ?>" name="_token">
+				    <input type="hidden" value="{{$contract_id}}" name="contract_id">
+				</form>
+				<br>
+			    <!-- The container for the uploaded files -->
+			    <div id="messages"></div>
 			    <br>
 			    <div class="nav-buttons">
 						<button id="btnPrev" class="col-sm-2 btn btn-primary pull-left">
@@ -71,11 +71,11 @@ $(function () {
         dataType: 'json',
         singleFileUploads:false,
         done: function (e, data) {
-            $.each(data._response.result.files, function (index, filename) {
-                $( '#files' ).append( "<p class=\"success\" style=\"color:green\">"+String(filename)+"</p>" );
+            $.each(data._response.result.files, function (index, file) {
+                $( '#messages' ).append( "<p class=\"success\" style=\"color:green\">"+String(file['message'])+"</p>" );
             });
             $.each(data._response.result.errors, function (index, error) {
-                $( '#files' ).append( "<p class=\"error\" style=\"color:red\">"+String(error)+"</p>" );
+                $( '#messages' ).append( "<p class=\"error\" style=\"color:red\">"+String(error)+"</p>" );
             });
         }
     });
