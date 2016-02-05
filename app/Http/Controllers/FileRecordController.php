@@ -7,7 +7,6 @@ use App\FileRecord;
 use App\Contract;
 use Validator;
 use Auth;
-use Log;
 use Storage;
 use Cache;
 use UCrypt;
@@ -71,7 +70,6 @@ class FileRecordController extends Controller
 
 		if ($contract->user_id != Auth::user()->id){
 			$errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
-			Log::warning('Showing error array for case1: '.$errors[0]);
 			return array(
 				'files' => $files,
 	        	'errors' => $errors
@@ -116,7 +114,6 @@ class FileRecordController extends Controller
 
 		 	if ($currentfilecount >= 10) {
 		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed tits!)';
-		 		Log::warning('Showing error array for case1: '.$errors[0]);
 		 		break;
 		 	}
 	        $validator = Validator::make(
@@ -137,7 +134,6 @@ class FileRecordController extends Controller
 				 	//check whether file already exists for this contract
 				 	if (array_search($shafile, $currentfilehashes) !== false) {
 				 		$errors[] = 'File ' . $upload->getClientOriginalName() . ' has already been added to this contract';
-				 		Log::warning('Showing error array for case1: '.$errors[0]);
 				 	}
 				 	else{
 				 		//encrypt
@@ -161,7 +157,6 @@ class FileRecordController extends Controller
 	        else {
 	            // Collect error messages
 	            $errors[] = 'File ' . $upload->getClientOriginalName() . ':' . $validator->messages()->first('file');
-	            Log::warning('Showing error array for case1: '.$errors[0]);
 	        }
 
 	    }
