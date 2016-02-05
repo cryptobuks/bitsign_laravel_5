@@ -93,12 +93,13 @@ class FileRecordController extends Controller
 	        $all_uploads = array($all_uploads);
 	    }
 
+	    $currentfiles = $contract->filerecords();
+	    $currentfilecount = $currentfiles->count();
+
 	    // Loop through all uploaded files
 	    foreach ($all_uploads as $upload) {
-
-	    	$currentfiles = $contract->filerecords();
-		 	if ($currentfiles->count() >= 10) {
-		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed)';
+		 	if ($currentfilecount >= 10) {
+		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed tits!)';
 		 		break;
 		 	}
 	        $validator = Validator::make(
@@ -134,6 +135,7 @@ class FileRecordController extends Controller
 				        $filerecord->type = $mimetype;
 				        $filerecord->encrypted = true;
 				        $filerecord->save();
+				        $currentfilecount++;
 						$files[] = 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile ;
 				 	}
 				} 
