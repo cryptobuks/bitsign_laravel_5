@@ -46,7 +46,7 @@ class SigneeRecordController extends Controller
         if ($sigs = Contract::find($id)->signatures) {
             foreach ($sigs as $sig) {
                 $signee = $sig->user;
-                $data['signeerecords'][] = ['name'=>$signee->f_name.' '.$signee->l_name, 'email'=>$signee->email];
+                $data['signeerecords'][] = ['name'=>$signee->f_name.' '.$signee->l_name, 'email'=>$signee->email, 'id' =>$sig->id];
             }
         }
 
@@ -189,6 +189,18 @@ class SigneeRecordController extends Controller
      */
     public function destroy($id)
     {
-        //
+        //Check whether this contract belongs to this user
+        $signeerecord = Signature::find($id);
+
+        if ($signeerecord->contract->user_id != Auth::user()->id){
+            $errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
+            return array(
+                'files' => $files,
+                'errors' => $errors
+            );
+        }
+
+        $signeerecord->delete();
+        return response()->json(array('deleted' => $id));
     }
 }

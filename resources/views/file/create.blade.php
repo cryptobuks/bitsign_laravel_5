@@ -106,16 +106,16 @@ $(function () {
 		LoadAjaxContent(ajax_url);
     });
     //delete button
-    $(".delete-button").click(function(){
-    	$.get(
-            $(this).attr('data-url'),
-            function(data){
-            	if (typeof(data["deleted"]) != "undefined") {
+	$(".delete-button").on("click", function(){
+		$.get(
+	        $(this).attr('data-url'),
+	        function(data){
+	        	if (typeof(data["deleted"]) != "undefined") {
 	            	$("#"+data["deleted"]).remove();
 	            };
-            },
-            'json'
-        );
-    });
+	        },
+	        'json'
+	    );
+	});
 });
 </script>

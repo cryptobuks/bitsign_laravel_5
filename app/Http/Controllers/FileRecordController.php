@@ -144,7 +144,6 @@ class FileRecordController extends Controller
 				        $files[] = array(
 				        	'filename' => $upload->getClientOriginalName(),
 				        	'hash' => $shafile,
-				        	'message' => 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile,
 				        	'id' => $filerecord->getKey()
 				        	);
 				 	}

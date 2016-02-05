@@ -769,14 +769,14 @@ ul.DTTT_dropdown.dropdown-menu > li:hover > a {
   display: block;
 }
 .btn-app-sm {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
   padding: 0;
   font-size: 14px;
 }
 .btn-app-sm i {
-  font-size: 14px;
-  line-height: 28px;
+  font-size: 10px;
+  line-height: 18px;
   display: block;
 }
 .btn-circle {
