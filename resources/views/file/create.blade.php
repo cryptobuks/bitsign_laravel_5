@@ -30,16 +30,31 @@
 				<div class="no-move"></div>
 			</div>
 			<div class="box-content">
+				<h4 class="page-header">Add files that you want to be part of this record</h4>
+				<div>
+				<table class="table table-bordered table-striped table-hover table-heading table-datatable">
+					<thead>
+						<tr>
+							<th>File Name</th>
+							<th>Hash Value</th>
+							<th><center>Delete</center></th>
+						</tr>
+					</thead>
+					<tbody id="files">
+					@if(isset($filerecords))
+					@foreach($filerecords as $filerecord)
+						<tr id="{{$filerecord['id']}}">
+							<td>{{$filerecord['filename']}}</td>
+							<td>{{$filerecord['hash']}}</td>
+							<td><center><button data-url="file/{{$filerecord['id']}}/delete" class="delete-button btn-app-sm btn-circle btn-danger"><i class="fa fa-remove"></i></button></center></td>
+						</tr>
+					@endforeach
+					@endif
+					</tbody>
+				</table>
+		    	</div>
 				<form id="fileupload" action="file" method="POST" enctype="multipart/form-data">
-					<h4 class="page-header">Add files that you want to be part of this record</h4>
 					<input type="file" name="files[]" multiple>
-					<div id="files">
-			    	@if(isset($filerecords))
-			    	@foreach($filerecords as $filerecord)
-			    	<p class="success" style="color:green">File {{$filerecord['filename']}} successfully added as hash value: {{$filerecord['hash']}}</p>
-			    	@endforeach
-			    	@endif
-			    	</div>
 					<input type="hidden" value="<?php echo csrf_token(); ?>" name="_token">
 				    <input type="hidden" value="{{$contract_id}}" name="contract_id">
 				</form>
@@ -72,11 +87,14 @@ $(function () {
         singleFileUploads:false,
         done: function (e, data) {
             $.each(data._response.result.files, function (index, file) {
-                $( '#messages' ).append( "<p class=\"success\" style=\"color:green\">"+String(file['message'])+"</p>" );
+                $( '#files' ).append("<tr id=\""+String(file['id'])+"\"><td>"+String(file['filename'])+"</td><td>"+String(file['hash'])+"</td><td><center><button data-url=\"file/"+String(file['id'])+"/delete\" class=\"delete-button btn-app-sm btn-circle btn-danger\"><i class=\"fa fa-remove\"></i></button></center></td></tr>");
             });
             $.each(data._response.result.errors, function (index, error) {
                 $( '#messages' ).append( "<p class=\"error\" style=\"color:red\">"+String(error)+"</p>" );
             });
+            if (typeof(data._response.result.deleted) != "undefined") {
+            	$("#"+data._response.result.deleted).remove();
+            };
         }
     });
     $("#btnNext").click(function(){
@@ -86,6 +104,18 @@ $(function () {
     $("#btnPrev").click(function(){
     	var ajax_url = 'contracts/' + '{{$contract_id}}' +'/edit';
 		LoadAjaxContent(ajax_url);
+    });
+    //delete button
+    $(".delete-button").click(function(){
+    	$.get(
+            $(this).attr('data-url'),
+            function(data){
+            	if (typeof(data["deleted"]) != "undefined") {
+	            	$("#"+data["deleted"]).remove();
+	            };
+            },
+            'json'
+        );
     });
 });
 </script>
