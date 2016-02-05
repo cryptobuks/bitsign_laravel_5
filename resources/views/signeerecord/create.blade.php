@@ -30,7 +30,7 @@
 				<div class="no-move"></div>
 			</div>
 			<div class="box-content">
-				<h4 class="page-header">Add people who need to sign this contact</h4>
+				<h4 class="page-header">Add people that need to sign this contract</h4>
 				<form class="form-horizontal" role="form" action="signeerecord" method="post" id="form-add-signees">
 					<div class="form-group">
 						<div class="col-sm-10">
@@ -47,13 +47,28 @@
 					<input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
 					<input type="hidden" name="contract_id" value="{{$contract_id}}">
 				</form>
-				<div id="added_signees" class="added_signees">
+				<div>
+				<table class="table table-bordered table-striped table-hover table-heading table-datatable">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Email</th>
+							<th><center>Delete</center></th>
+						</tr>
+					</thead>
+					<tbody id="added-signees">
 					@if(isset($signeerecords))
-			    	@foreach($signeerecords as $signeerecord)
-			    	<p class="success" style="color:green">Signee {{$signeerecord['name']}} successfully added to this contract ({{$signeerecord['email']}})</p>
-			    	@endforeach
-			    	@endif
-				</div>
+					@foreach($signeerecords as $signeerecord)
+						<tr id="{{$signeerecord['id']}}">
+							<td>{{$signeerecord['name']}}</td>
+							<td>{{$signeerecord['email']}}</td>
+							<td><center><button data-url="signeerecord/{{$signeerecord['id']}}/delete" class="delete-button btn-app-sm btn-circle btn-danger"><i class="fa fa-remove"></i></button></center></td>
+						</tr>
+					@endforeach
+					@endif
+					</tbody>
+				</table>
+		    	</div>
 				<br>
 				<div class="nav-buttons">
 						<button id="btnPrev" class="col-sm-2 btn btn-primary pull-left">
@@ -85,7 +100,7 @@ $(function () {
             },
             function(data){
             	if(data['exists']==1) {
-					$('#added_signees').append("<p style=\"color:green\">"+String('Signee '+data['name']+data['message']+data['email']+')')+'</p>');
+            		$( '#added-signees' ).append("<tr id=\""+String(data['id'])+"\"><td>"+String(data['name'])+"</td><td>"+String(data['email'])+"</td><td><center><button data-url=\"signeerecord/"+String(data['id'])+"/delete\" class=\"delete-button btn-app-sm btn-circle btn-danger\"><i class=\"fa fa-remove\"></i></button></center></td></tr>");
 				}
 				else if(data['exists']==0) {
 					$('#added_signees').append("<p style=\"color:orange\">"+String(data['message']+data['email'])+'</p>');
@@ -105,5 +120,17 @@ $(function () {
     	var ajax_url = 'file/' + '{{$contract_id}}';
 		LoadAjaxContent(ajax_url);
     });
+    //delete button
+	$(".delete-button").on("click", function(){
+		$.get(
+	        $(this).attr('data-url'),
+	        function(data){
+	        	if (typeof(data["deleted"]) != "undefined") {
+	            	$("#"+data["deleted"]).remove();
+	            };
+	        },
+	        'json'
+	    );
+	});
 });
 </script>
