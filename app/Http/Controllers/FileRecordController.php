@@ -141,7 +141,10 @@ class FileRecordController extends Controller
 				        $filerecord->encrypted = true;
 				        $filerecord->save();
 				        $currentfilecount++;
-						$files[] = 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile ;
+				        $files[] = array(
+				        	'filename' => $upload->getClientOriginalName(),
+				        	'message' => 'File ' . $upload->getClientOriginalName() . ' successfully added as hash value: ' . $shafile
+				        	);
 				 	}
 				} 
 	        } 
@@ -174,13 +177,29 @@ class FileRecordController extends Controller
 
 	/**
 	 * Remove the specified resource from storage.
-	 * DELETE /contracts/{id}
+	 * POST /contracts/{id}
 	 *
 	 * @param  int  $id
 	 * @return Response
 	 */
 	public function destroy($id)
 	{
-		//
+		//Check whether this contract belongs to this user
+		$filerecord = FileRecord::find($id);
+
+		if ($filerecord->contract->user_id != Auth::user()->id){
+			$errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
+			return array(
+				'files' => $files,
+	        	'errors' => $errors
+	    	);
+		}
+
+		$filerecord->delete();
+		return array(
+				'files' => $files,
+	        	'errors' => $errors,
+	        	'deleted' => 1
+	    	);
 	}
 }
