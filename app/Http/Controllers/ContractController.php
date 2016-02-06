@@ -32,9 +32,9 @@ class ContractController extends Controller
 	public function index()
 	{
 		$contracts = array();
-		$user = Auth::user();
-		$secret = Cache::get($user->id);
-		$contracts_raw = $user->contracts;
+		$creator = Auth::user();
+		$secret = Cache::get($creator->id);
+		$contracts_raw = $creator->contracts;
 		foreach ($contracts_raw as $key => $contract) {
 			UCrypt::setKey($secret);
 			$contract_key = Ucrypt::decrypt($contract->key);
@@ -85,7 +85,7 @@ class ContractController extends Controller
 		//contract data
 		$contract = Contract::find($id);
 		$auth_user_id = Auth::user()->id;
-		if ($contract->user_id!=$auth_user_id){
+		if ($contract->creator_id!=$auth_user_id){
 			abort(422);
 		}
 		Ucrypt::setKey(Cache::get($auth_user_id));
@@ -120,7 +120,7 @@ class ContractController extends Controller
         // store in database
         $contract = new Contract;
         $contract->setSecret(Cache::get($creator_id));
-        $contract->user_id = $creator_id;
+        $contract->creator_id = $creator_id;
         $contract->contracttype_id = $request->contract_type;
         $contract->key = $contract_key;
         $contract->save();
@@ -158,14 +158,14 @@ class ContractController extends Controller
     	]);
 
 		// get input
- 		$creator_id = Auth::user()->id;
+ 		$auth_user_id = Auth::user()->id;
         $contract_title = $request->contract_title;
         $contract_content = $request->contract_content;
         
         //save the encrypted stuff
         //new object
         $contract = Contract::find($id);
-        UCrypt::setKey(Cache::get($creator_id));
+        UCrypt::setKey(Cache::get($auth_user_id));
         $contract->setSecret(UCrypt::decrypt($contract->key));
         if ($contract->title != $contract_title || $contract->content != $contract_content) {
         	$contract->title = $contract_title;

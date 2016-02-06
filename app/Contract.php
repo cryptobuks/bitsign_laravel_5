@@ -23,12 +23,12 @@ class Contract extends Model
     protected $encrypted = ['title', 'content', 'key'];
 
 	/**
-     * Get the user that owns the contract.
+     * Get the user that created the contract.
      */
 
-	public function user()
+	public function creator()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'creator_id');
     }
 
     /**
