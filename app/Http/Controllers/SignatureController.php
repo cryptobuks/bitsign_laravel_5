@@ -316,14 +316,16 @@ class SignatureController extends Controller
         $doc->getElementById('contract-content')->appendChild($newnode);
         //write filerecords
         $attachmentsnode = $doc->getElementsByTagName('attachments')[0];
-        foreach ($data['filerecords'] as $filerecord) {
-            $attachmentnode = $attachmentsnode->appendChild($doc->createElement('attachment'));
-            $objectnode = $attachmentnode->appendChild($doc->createElement('object'));
-            $objectnode->setAttribute("type", $filerecord['type']);
-            $datanode = $objectnode->appendChild($doc->createElement('data'));
-            $datanode->setAttribute("src", $filerecord['filename']);
-            $hashnode = $objectnode->appendChild($doc->createElement('hash', $filerecord['hash']));
-            $hashnode->setAttribute("algorithm", "sha384");
+        if (isset($data['filerecords'])) {
+            foreach ($data['filerecords'] as $filerecord) {
+                $attachmentnode = $attachmentsnode->appendChild($doc->createElement('attachment'));
+                $objectnode = $attachmentnode->appendChild($doc->createElement('object'));
+                $objectnode->setAttribute("type", $filerecord['type']);
+                $datanode = $objectnode->appendChild($doc->createElement('data'));
+                $datanode->setAttribute("src", $filerecord['filename']);
+                $hashnode = $objectnode->appendChild($doc->createElement('hash', $filerecord['hash']));
+                $hashnode->setAttribute("algorithm", "sha384");
+            }
         }
         //save the file
         $doc->save($filepath);
