@@ -87,7 +87,7 @@ class SigneeRecordController extends Controller
         if ($signee = User::where('email',$usr_email)->first()) {
             if (Signature::where(['user_id'=>$signee->id,'contract_id'=>$contract->id])->first()) {
                 //respond with JSON of user data
-                return response()->json(['exists' => 1, 'name' => $signee->f_name.' '.$signee->l_name, 'email' => $usr_email, 'message'=>' is already added to this contract (']);
+                return response()->json(['exists' => 2, 'name' => $signee->f_name.' '.$signee->l_name, 'email' => $usr_email]);
             }
             else{
                 // load the signee pubkey, and encrypt
@@ -102,7 +102,7 @@ class SigneeRecordController extends Controller
                 $signeerecord->term = 'default';
                 $signeerecord->save();
                 //respond with JSON of user data
-                return response()->json(['exists' => 1, 'name' => $signee->f_name.' '.$signee->l_name, 'email' => $usr_email, 'message'=>' successfully added to this contract (']);
+                return response()->json(['exists' => 1, 'name' => $signee->f_name.' '.$signee->l_name, 'email' => $usr_email, 'id'=>$signeerecord->id]);
             }
         }
 
