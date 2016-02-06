@@ -63,6 +63,7 @@
 					</div>
 					<div class="filerecords">
 						<h4>File Records</h4>
+						@if(isset($contract_data['filerecords']))
 						@foreach ($contract_data['filerecords'] as $filerecord)
 						<div class="filerecord">
 							<p><strong>Filename: </strong>{{$filerecord['filename']}}</p>
@@ -70,6 +71,11 @@
 							<p><strong>Hash: </strong>{{$filerecord['hash']}}</p>
 						</div>
 						@endforeach
+						@else
+						<div class="filerecord">
+							<br><p style="color:red;"><strong>No Files Attached</strong></p><br>
+						</div>
+						@endif
 					</div>
 				</div>
 				<br>
