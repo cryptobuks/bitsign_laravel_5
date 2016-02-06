@@ -97,10 +97,12 @@ $(function () {
     });
     $("#btnNext").click(function(){
     	var ajax_url = 'signeerecord/' + '{{$contract_id}}';
+    	window.location.hash = ajax_url;
 		LoadAjaxContent(ajax_url);
     });
     $("#btnPrev").click(function(){
     	var ajax_url = 'contracts/' + '{{$contract_id}}' +'/edit';
+    	window.location.hash = ajax_url;
 		LoadAjaxContent(ajax_url);
     });
     RefreshActionButtons();
