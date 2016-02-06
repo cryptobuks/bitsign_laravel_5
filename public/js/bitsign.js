@@ -160,18 +160,6 @@ function LoadAjaxContent(url){
 	});
 }
 //
-// Swap 2 elements on page. Used by WinMove function
-//
-jQuery.fn.swap = function(b){
-	b = jQuery(b)[0];
-	var a = this[0];
-	var t = a.parentNode.insertBefore(document.createTextNode(''), a);
-	b.parentNode.insertBefore(a, b);
-	t.parentNode.insertBefore(b, t);
-	t.parentNode.removeChild(t);
-	return this;
-};
-//
 //  Function for create 2 dates in human-readable format (with leading zero)
 //
 function PrettyDates(){
