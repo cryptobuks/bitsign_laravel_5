@@ -43,10 +43,10 @@
 					<tbody id="files">
 					@if(isset($filerecords))
 					@foreach($filerecords as $filerecord)
-						<tr id="{{$filerecord['id']}}">
+						<tr class="file" id="{{$filerecord['id']}}">
 							<td>{{$filerecord['filename']}}</td>
 							<td>{{$filerecord['hash']}}</td>
-							<td><center><button data-url="file/{{$filerecord['id']}}/delete" class="delete-button btn-app-sm btn-circle btn-danger"><i class="fa fa-remove"></i></button></center></td>
+							<td><center><button id="{{$filerecord['id']}}" class="delete-button btn-app-sm btn-circle btn-danger"><i class="fa fa-remove"></i></button></center></td>
 						</tr>
 					@endforeach
 					@endif
@@ -87,14 +87,12 @@ $(function () {
         singleFileUploads:false,
         done: function (e, data) {
             $.each(data._response.result.files, function (index, file) {
-                $( '#files' ).append("<tr id=\""+String(file['id'])+"\"><td>"+String(file['filename'])+"</td><td>"+String(file['hash'])+"</td><td><center><button data-url=\"file/"+String(file['id'])+"/delete\" class=\"delete-button btn-app-sm btn-circle btn-danger\"><i class=\"fa fa-remove\"></i></button></center></td></tr>");
+                $( '#files' ).append("<tr class=\"file\" id=\""+String(file['id'])+"\"><td>"+String(file['filename'])+"</td><td>"+String(file['hash'])+"</td><td><center><button id=\""+String(file['id'])+"\" class=\"delete-button btn-app-sm btn-circle btn-danger\"><i class=\"fa fa-remove\"></i></button></center></td></tr>");
             });
             $.each(data._response.result.errors, function (index, error) {
                 $( '#messages' ).append( "<p class=\"error\" style=\"color:red\">"+String(error)+"</p>" );
             });
-            if (typeof(data._response.result.deleted) != "undefined") {
-            	$("#"+data._response.result.deleted).remove();
-            };
+            RefreshActionButtons();
         }
     });
     $("#btnNext").click(function(){
@@ -105,17 +103,6 @@ $(function () {
     	var ajax_url = 'contracts/' + '{{$contract_id}}' +'/edit';
 		LoadAjaxContent(ajax_url);
     });
-    //delete button
-	$(".delete-button").on("click", function(){
-		$.get(
-	        $(this).attr('data-url'),
-	        function(data){
-	        	if (typeof(data["deleted"]) != "undefined") {
-	            	$("#"+data["deleted"]).remove();
-	            };
-	        },
-	        'json'
-	    );
-	});
+    RefreshActionButtons();
 });
 </script>

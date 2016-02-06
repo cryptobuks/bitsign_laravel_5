@@ -33,16 +33,13 @@
 				<h4 class="page-header">Add people that need to sign this contract</h4>
 				<form class="form-horizontal" role="form" action="signeerecord" method="post" id="form-add-signees">
 					<div class="form-group">
-						<div class="col-sm-10">
-								<input type="text" class="form-control" name="signee_email" id="signee_email"/>
-								<button type="submit" class="btn btn-primary btn-label-left btn-block">
-								<span><i class="fa fa-save"></i></span>
+						<div class="col-sm-4">
+								<input type="text" placeholder="email address" class="form-control" name="signee_email" id="signee_email"/>
+								<button type="submit" class="btn btn-success btn-label-left btn-block">
+								<span><i class="fa fa-plus"></i></span>
 									Add Signee
 								</button>
 						</div>
-					</div>
-					<div class="form-group">
-						<!-- The container for the uploaded files -->
 					</div>
 					<input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
 					<input type="hidden" name="contract_id" value="{{$contract_id}}">
@@ -59,17 +56,17 @@
 					<tbody id="added-signees">
 					@if(isset($signeerecords))
 					@foreach($signeerecords as $signeerecord)
-						<tr id="{{$signeerecord['id']}}">
+						<tr class="signeerecord" id="{{$signeerecord['id']}}">
 							<td>{{$signeerecord['name']}}</td>
 							<td>{{$signeerecord['email']}}</td>
-							<td><center><button data-url="signeerecord/{{$signeerecord['id']}}/delete" class="delete-button btn-app-sm btn-circle btn-danger"><i class="fa fa-remove"></i></button></center></td>
+							<td><center><button id="{{$signeerecord['id']}}" class="delete-button btn-app-sm btn-circle btn-danger"><i class="fa fa-remove"></i></button></center></td>
 						</tr>
 					@endforeach
 					@endif
 					</tbody>
 				</table>
 		    	</div>
-				<br>
+		    	<div id="messages"></div>
 				<div class="nav-buttons">
 						<button id="btnPrev" class="col-sm-2 btn btn-primary pull-left">
 							<span style="padding-right:8px"><i class="fa fa-arrow-left"></i></span>
@@ -100,11 +97,15 @@ $(function () {
             },
             function(data){
             	if(data['exists']==1) {
-            		$( '#added-signees' ).append("<tr id=\""+String(data['id'])+"\"><td>"+String(data['name'])+"</td><td>"+String(data['email'])+"</td><td><center><button data-url=\"signeerecord/"+String(data['id'])+"/delete\" class=\"delete-button btn-app-sm btn-circle btn-danger\"><i class=\"fa fa-remove\"></i></button></center></td></tr>");
+            		$( '#added-signees' ).append("<tr class=\"signeerecord\" id=\""+String(data['id'])+"\"><td>"+String(data['name'])+"</td><td>"+String(data['email'])+"</td><td><center><button id=\""+String(data['id'])+"\" class=\"delete-button btn-app-sm btn-circle btn-danger\"><i class=\"fa fa-remove\"></i></button></center></td></tr>");
 				}
 				else if(data['exists']==0) {
-					$('#added_signees').append("<p style=\"color:orange\">"+String(data['message']+data['email'])+'</p>');
+					$('#messages').append("<p style=\"color:orange\">"+String(data['message']+data['email'])+'</p>');
 				}
+				else if(data['exists']==2) {
+					$('#messages').append("<p style=\"color:red\">Signee "+data['name']+" already added ("+data['email']+")</p>");
+				}
+				RefreshActionButtons();
             },
             'json'
         ); 
@@ -120,17 +121,6 @@ $(function () {
     	var ajax_url = 'file/' + '{{$contract_id}}';
 		LoadAjaxContent(ajax_url);
     });
-    //delete button
-	$(".delete-button").on("click", function(){
-		$.get(
-	        $(this).attr('data-url'),
-	        function(data){
-	        	if (typeof(data["deleted"]) != "undefined") {
-	            	$("#"+data["deleted"]).remove();
-	            };
-	        },
-	        'json'
-	    );
-	});
+    RefreshActionButtons();
 });
 </script>
