@@ -82,6 +82,7 @@ $(document).ready(function() {
 		            },
 		            function(data){
 		            	var ajax_url = 'file/' + data["contract_id"];
+		            	window.location.hash = ajax_url;
 		                LoadAjaxContent(ajax_url);
 		            },
 		            'json'

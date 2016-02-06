@@ -115,10 +115,12 @@ $(function () {
 	//navigation buttons
     $("#btnNext").click(function(){
     	var ajax_url = 'sign/' + '{{$contract_id}}';
+    	window.location.hash = ajax_url;
 		LoadAjaxContent(ajax_url);
     });
     $("#btnPrev").click(function(){
     	var ajax_url = 'file/' + '{{$contract_id}}';
+    	window.location.hash = ajax_url;
 		LoadAjaxContent(ajax_url);
     });
     RefreshActionButtons();
