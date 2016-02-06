@@ -164,6 +164,10 @@
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="plugins/bootstrap/bootstrap.min.js"></script>
 <script src="plugins/tinymce/tinymce.min.js"></script>
+<!-- file upload plusings used in file/create -->
+<script src="plugins/file-upload/js/vendor/jquery.ui.widget.js"></script>
+<script src="plugins/file-upload/js/jquery.iframe-transport.js"></script>
+<script src="plugins/file-upload/js/jquery.fileupload.js"></script>
 <!-- All functions for this theme + document.ready processing -->
 <script src="js/bitsign.js"></script>
 </body>
