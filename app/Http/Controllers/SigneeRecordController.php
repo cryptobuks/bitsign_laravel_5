@@ -69,7 +69,7 @@ class SigneeRecordController extends Controller
             ));
 
         //set data to variable
-        $contract = Contract::find($request->contract_id);
+        $contract = Contract::with('signatures')->find($request->contract_id);
         $contract->hash = '';
         $contract->save();
         //fetch contract key
@@ -85,7 +85,8 @@ class SigneeRecordController extends Controller
 
         //Check whether user is registered
         if ($signee = User::where('email',$usr_email)->first()) {
-            if (Signature::where(['user_id'=>$signee->id,'contract_id'=>$contract->id])->first()) {
+            //check if already added
+            if ($contract->signatures->where('user_id', $signee->id)->first()) {
                 //respond with JSON of user data
                 return response()->json(['exists' => 2, 'name' => $signee->f_name.' '.$signee->l_name, 'email' => $usr_email]);
             }
@@ -190,7 +191,7 @@ class SigneeRecordController extends Controller
     public function destroy($id)
     {
         //Check whether this contract belongs to this user
-        $signeerecord = Signature::find($id);
+        $signeerecord = Signature::with('contract')->find($id);
 
         if ($signeerecord->contract->creator_id != Auth::user()->id){
             $errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
