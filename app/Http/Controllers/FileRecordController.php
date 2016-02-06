@@ -63,7 +63,7 @@ class FileRecordController extends Controller
 		$errors = array();
 	    $files = array();
 	    //get the current contact
-	    $contract = Contract::find($contract_id);
+	    $contract = Contract::with('filerecords')->find($contract_id);
 	    $contract->hash = '';
 	    $contract->save();
 
@@ -93,14 +93,14 @@ class FileRecordController extends Controller
 	    if (!is_array($all_uploads)) {
 	        $all_uploads = array($all_uploads);
 	    }
-	    //get info about current filerecords
-	    $currentfiles = $contract->filerecords;
-	    $currentfilecount = $currentfiles->count();
+	    //get current filerecords' hashes into array
 	    $currentfilehashes = array();
 
-	    foreach ($currentfiles as $key => $curfile) {
+	    foreach ($contract->filerecords as $key => $curfile) {
 	    	$currentfilehashes[$key] = $curfile->hash;
 	    }
+
+	    $currentfilecount = count($currentfilehashes);
 
 	    // Loop through all uploaded files
 	    foreach ($all_uploads as $upload) {
@@ -187,7 +187,7 @@ class FileRecordController extends Controller
 	public function destroy($id)
 	{
 		//Check whether this contract belongs to this user
-		$filerecord = FileRecord::find($id);
+		$filerecord = FileRecord::with('contract')->find($id);
 
 		if ($filerecord->contract->creator_id != Auth::user()->id){
 			$errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
