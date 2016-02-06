@@ -44,11 +44,13 @@ Route::resource('file', 'FileRecordController',
 	array('only' => array('store')));
 
 Route::get('file/{id}', ['uses' => 'FileRecordController@create']);
+Route::get('file/{id}/delete', ['uses' => 'FileRecordController@destroy']);
 
 /*Routing for Signature Record Controller*/
 
 Route::get('signeerecord/{id}', ['uses' => 'SigneeRecordController@create']);
 Route::post('signeerecord', ['uses' => 'SigneeRecordController@store']);
+Route::get('signeerecord/{id}/delete', ['uses' => 'SigneeRecordController@destroy']);
 
 /*Routing for Signature Controller*/
 Route::get('sign/{contract_id}', 'SignatureController@create');
