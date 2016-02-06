@@ -194,7 +194,7 @@ class SignatureController extends Controller
         //set filepath
         $filepath = storage_path('contracts/').$contract->id.'/contract.xml';
         //get the contract decryption key
-        if ($contract->user_id != $auth_user_id) {
+        if ($contract->creator_id != $auth_user_id) {
             $pkeyname = Cache::get($auth_user_id.'priv').'.pem';
             $pubenc_contractkey = $contract->signatures->where('user_id',$auth_user_id)->first()->contractkey_enc;
             openssl_private_decrypt(

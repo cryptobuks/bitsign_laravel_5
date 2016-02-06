@@ -79,7 +79,7 @@ class SigneeRecordController extends Controller
         $usr_email = $request->email;
 
         //Check whether this user has permission to edit this contract
-        if ($contract->user_id != $auth_user->id){
+        if ($contract->creator_id != $auth_user->id){
             abort(422);
         }
 
@@ -192,7 +192,7 @@ class SigneeRecordController extends Controller
         //Check whether this contract belongs to this user
         $signeerecord = Signature::find($id);
 
-        if ($signeerecord->contract->user_id != Auth::user()->id){
+        if ($signeerecord->contract->creator_id != Auth::user()->id){
             $errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
             return array(
                 'files' => $files,

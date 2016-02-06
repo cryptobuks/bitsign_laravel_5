@@ -49,7 +49,7 @@ class User extends Model implements AuthenticatableContract,
      */
     public function contracts()
     {
-        return $this->hasMany(Contract::class);
+        return $this->hasMany(Contract::class, 'creator_id');
     }
 
     /**

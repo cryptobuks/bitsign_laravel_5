@@ -57,6 +57,7 @@ class FileRecordController extends Controller
 	{
 		
 		$contract_id = $request->contract_id;
+		$auth_user = Auth::user();
 
 		//instantiate arrays
 		$errors = array();
@@ -68,7 +69,7 @@ class FileRecordController extends Controller
 
 		//Check whether this contract belongs to this user
 
-		if ($contract->user_id != Auth::user()->id){
+		if ($contract->creator_id != $auth_user->id){
 			$errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
 			return array(
 				'files' => $files,
@@ -77,7 +78,7 @@ class FileRecordController extends Controller
 		}
 
 		//get the contract key
-		$contract->setSecret(Cache::get(Auth::user()->id));
+		$contract->setSecret(Cache::get($auth_user->id));
 		$contract_key = $contract->key;
 
 		//Set the upload parameters
@@ -188,7 +189,7 @@ class FileRecordController extends Controller
 		//Check whether this contract belongs to this user
 		$filerecord = FileRecord::find($id);
 
-		if ($filerecord->contract->user_id != Auth::user()->id){
+		if ($filerecord->contract->creator_id != Auth::user()->id){
 			$errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
 			return array(
 				'files' => $files,

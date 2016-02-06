@@ -20,7 +20,7 @@ class CreateContractsTable extends Migration {
 			$table->increments('id');
 			$table->string('title',276);
 			$table->longText('content');
-			$table->integer('user_id')->length(10)->unsigned()->index();
+			$table->integer('creator_id')->length(10)->unsigned()->index();
 			$table->integer('contracttype_id')->length(4)->unsigned();
 			$table->string('key',244);
 			$table->char('hash', 64);
