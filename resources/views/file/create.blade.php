@@ -77,9 +77,6 @@
 		</div>
 	</div>
 </div>
-<script src="plugins/file-upload/js/vendor/jquery.ui.widget.js"></script>
-<script src="plugins/file-upload/js/jquery.iframe-transport.js"></script>
-<script src="plugins/file-upload/js/jquery.fileupload.js"></script>
 <script>
 $(function () {
     $('#fileupload').fileupload({
