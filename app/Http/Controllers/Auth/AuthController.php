@@ -190,8 +190,9 @@ class AuthController extends Controller
         $user = User::create([
             'f_name' => $data['f_name'],
             'l_name' => $data['l_name'],
-            'email' => $data['email']]);
-        $user->password = bcrypt($data['password']);
+            'email' => $data['email']
+            'password' => bcrypt($data['password'])
+            ]);
         //create and store user key to variable
         $user_key = str_random(32);
         //encrypt user_key with server pubkey and store
