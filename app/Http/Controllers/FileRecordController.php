@@ -89,7 +89,7 @@ class FileRecordController extends Controller
 	    // Loop through all uploaded files
 	    foreach ($all_uploads as $upload) {
 		 	if ($currentfilecount >= 10) {
-		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed tits!)';
+		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed)';
 		 		break;
 		 	}
 	        $validator = Validator::make(
