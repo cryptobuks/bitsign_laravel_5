@@ -206,6 +206,9 @@ class AuthController extends Controller
         $user_key_enc = UCrypt::encrypt($user_key);
         //generate the signing keypair
         $filenames = $this->generateKeypair($user_key);
+        UCrypt::setKey($user_key);
+        $signkeyname_enc = UCrypt::encrypt($filenames['privkey']);
+        $pubkeyname = $filenames['pubkey'];
         //Cache
         Cache::forever($user->id, $user_key);
         Cache::forever($user->id.'priv', $filenames['privkey']);
