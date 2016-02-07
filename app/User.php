@@ -14,7 +14,7 @@ class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
                                     CanResetPasswordContract
 {
-    use Authenticatable, Authorizable, CanResetPassword, Encryption;
+    use Authenticatable, Authorizable, CanResetPassword;
 
     /**
      * The database table used by the model.
@@ -28,21 +28,14 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $fillable = ['f_name', 'l_name', 'email', 'password'];
-
-    /**
-     * The attributes that are encrypted.
-     *
-     * @var array
-     */
-    protected $encrypted = ['key_enc', 'signkeyname_enc'];
+    protected $fillable = ['f_name', 'l_name', 'email'];
 
     /**
      * The attributes excluded from the model's JSON form.
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'key_enc', 'signkeyname_enc', 'pubkey'];
 
     /**
      * Get all of the contracts created by the user.
@@ -57,7 +50,7 @@ class User extends Model implements AuthenticatableContract,
      */
     public function signatures()
     {
-        return $this->hasMany(Signature::class);
+        return $this->hasMany(Signature::class, 'signee_id');
     }
 
     /**

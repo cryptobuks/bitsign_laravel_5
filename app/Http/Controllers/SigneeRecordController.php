@@ -6,10 +6,9 @@ use Illuminate\Http\Request;
 use Auth;
 use Cache;
 use Mail;
+use UCrypt;
 use App\User;
 use App\Signature;
-use App\PendingSigrequest;
-use App\PendingUser;
 use App\Contract;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -21,20 +20,23 @@ class SigneeRecordController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create($id)
+    public function create($contract_id)
     {
+        $contract = Auth::user()->contracts->find($contract_id);
+        if (is_null($contract)) {
+            abort(422);
+        }
         //takes doc_id and appends to data array, then redirects to file import page
-
         $data = array(
-        'contract_id'  => $id,
+        'contract_id'  => $contract_id,
         'subheading1'   => 'Contracts',
         'subheading2' => 'Create Contract',
         'subheading3' => 'Add Signees'
         );
-
-        if ($sigs = Contract::find($id)->signatures) {
+        
+        if ($sigs = $contract->signatures) {
             foreach ($sigs as $sig) {
-                $signee = $sig->user;
+                $signee = $sig->signee;
                 $data['signeerecords'][] = ['name'=>$signee->f_name.' '.$signee->l_name, 'email'=>$signee->email, 'id' =>$sig->id];
             }
         }
@@ -57,84 +59,65 @@ class SigneeRecordController extends Controller
             'email' => 'required|email'
             ));
 
-        //set data to variable
+        //set data to variables
+        $auth_user_id = Auth::user()->id;
         $contract = Contract::with('signatures')->find($request->contract_id);
-        $contract->hash = '';
-        $contract->save();
-        //fetch contract key
-        $auth_user = Auth::user();
-        $contract->setSecret(Cache::get($auth_user->id));
-        $contract_key = $contract->key;
-        $usr_email = $request->email;
-
         //Check whether this user has permission to edit this contract
-        if ($contract->creator_id != $auth_user->id){
+        if ($contract->creator_id != $auth_user_id){
             abort(422);
         }
+        //fetch contract key
+        UCrypt::setKey(Cache::get($auth_user_id));
+        $contract_key = UCrypt::decrypt($contract->key_enc);
+        $usr_email = $request->email;
 
-        //Check whether user is registered
-        if ($signee = User::where('email',$usr_email)->first()) {
-            //check if already added
-            if ($contract->signatures->where('user_id', $signee->id)->first()) {
-                //respond with JSON of user data
-                return response()->json(['exists' => 2, 'name' => $signee->f_name.' '.$signee->l_name, 'email' => $usr_email]);
-            }
-            else{
-                // load the signee pubkey, and encrypt
-                $pubkey = openssl_pkey_get_public(file_get_contents(storage_path('keys').'/'.$signee->pubkey.'.pem'));
-                openssl_public_encrypt($contract_key, $encryptedcc, $pubkey);
-                //add record to Signatures
-                $signeerecord = new Signature;
-                $signeerecord->contract_id = $contract->id;
-                $signeerecord->user_id = $signee->id;
-                $signeerecord->contractkey_enc = base64_encode($encryptedcc);
-                $signeerecord->status = 0;
-                $signeerecord->term = 'default';
-                $signeerecord->save();
-                //respond with JSON of user data
-                return response()->json(['exists' => 1, 'name' => $signee->f_name.' '.$signee->l_name, 'email' => $usr_email, 'id'=>$signeerecord->id]);
-            }
-        }
-
-        //else try to send a message, and add a record to pending users
-        else{
-            //add a record to pending users if not exists
-            $pendinguser = PendingUser::where('email', $usr_email)->first();
-            if ($pendinguser==null) {
-                $token = str_random(20);
-                $pendinguser = PendingUser::create(array(
-                    'email' => $usr_email,
-                    'token' => $token
-                    ));
-            }
-            else {
-                $token = $pendinguser->token;
-            }
-            //check if pending user is already added to contract
-            if (PendingSigrequest::where(['contract_id'=>$contract->id,'pending_user_id'=>$pendinguser->id])->first()) {
-                return response()->json(['exists' => 0, 'email' => $usr_email, 'message'=>'This person has already been added to this contract :']);
-            }
-            //add a record to pending sigrequsts
-            $pendingsigrequest = PendingSigrequest::create(array(
-                'contract_id' => $contract->id,
-                'pending_user_id' => $pendinguser->id
+        //Check whether user with this email exists
+        if (is_null($signee = User::where('email',$usr_email)->first())) {
+            //register the user
+            $signee = User::create(array(
+                'email' => $usr_email,
+                'registered' =>false
                 ));
+        }
+        elseif($contract->signatures->where('signee_id', $signee->id)->first()){
+            return response()->json(['exists' => 2, 'email' => $usr_email]);
+        }
+        //check if this user is pending
+        if ($signee->registered==true) {
+            // load the signee pubkey, and encrypt
+            $pubkey = openssl_pkey_get_public(file_get_contents(storage_path('keys').'/'.$signee->pubkey.'.pem'));
+            openssl_public_encrypt($contract_key, $encryptedcc, $pubkey);
+            $encryptedcc = base64_encode($encryptedcc);
+
+            $response = ['exists' => 1, 'name' => $signee->f_name.' '.$signee->l_name, 'email' => $usr_email];
+        }
+        else{
             $pendingsecret = str_random(32);
-            $pendingsigrequest->setSecret(hash('sha256', $token.$pendingsecret, true));
-            $pendingsigrequest->key_enc = $contract_key;
-            $pendingsigrequest->save();
-            //fetch unsigned signature requests for this email address
-            $unsigned_contracts = PendingSigrequest::where('pending_user_id',$pendinguser->id);
+            UCrypt::setKey($pendingsecret);
+            $encryptedcc = UCrypt::encrypt($contract_key);
             //send email
-            Mail::send('emails.pendingsignatures', ['unsigned_contracts' => $unsigned_contracts, 'pending_secret' => $pendingsecret, 'user_id'=>$pendinguser->id], function ($message) use ($usr_email) {
+            Mail::send('emails.pendingsignatures', ['pending_secret' => $pendingsecret, 'user_id'=>$signee->id], function ($message) use ($usr_email) {
             $message->from('admin@bitsign.it', 'BitSign.it');
 
             $message->to($usr_email)->subject('You have been requested to sign a document');
             });
             //respond with JSON
-            return response()->json(['exists' => 0, 'email' => $usr_email, 'message'=>'An invitation to join Bitsign.it has been sent to ']);
+            $response = ['exists' => 0, 'email' => $usr_email, 'message'=>'An invitation to join Bitsign.it has been sent to '];
         }
-
+        //add record to Signatures
+        $signeerecord = new Signature;
+        $signeerecord->contract_id = $contract->id;
+        $signeerecord->signee_id = $signee->id;
+        $signeerecord->contractkey_enc = $encryptedcc;
+        $signeerecord->status = false;
+        $signeerecord->term = 'default';
+        $signeerecord->save();
+        //reset contract
+        $contract->hash = '';
+        $contract->save();
+        //respond with JSON of user data
+        $response['id']=$signeerecord->id;
+        return response()->json($response);
     }
 
     /**
@@ -180,7 +163,7 @@ class SigneeRecordController extends Controller
     public function destroy($id)
     {
         //Check whether this contract belongs to this user
-        $signeerecord = Signature::with('contract')->find($id);
+        $signeerecord = Signature::with('contract', 'signee')->find($id);
 
         if ($signeerecord->contract->creator_id != Auth::user()->id){
             $errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
@@ -188,6 +171,13 @@ class SigneeRecordController extends Controller
                 'files' => $files,
                 'errors' => $errors
             );
+        }
+        //if it's a pending user
+        $signee = $signeerecord->signee;
+        if (!$signee->registered) {
+            if ($signee->signatures->count() <= 1) {
+                $signee->delete();
+            }
         }
 
         $signeerecord->delete();

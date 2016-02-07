@@ -8,8 +8,8 @@ use Validator;
 use Socialite;
 use Auth;
 use Cache;
+use UCrypt;
 use App\Http\Controllers\Controller;
-
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 use Illuminate\Http\Request;
@@ -186,37 +186,38 @@ class AuthController extends Controller
      */
     protected function create(array $data)
     {
-        //create the new user
+        //Create the User
         $user = User::create([
             'f_name' => $data['f_name'],
             'l_name' => $data['l_name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-        ]);
-        //create and store user key (auto encrypted)
+            'email' => $data['email']]);
+        $user->password = bcrypt($data['password']);
+        //create and store user key to variable
         $user_key = str_random(32);
-        $user->setSecret($this->generateCrypt($data['password']));
-        $user->key_enc = $user_key;
-        //var_dump($user->key_enc);
-        $user->save();
-        //encrypt user_key with servel pubkey and store
+        //encrypt user_key with server pubkey and store
         $serverpubkey = openssl_pkey_get_public(file_get_contents(base_path('resources/keys').'/serverpublic.pem'));
         openssl_public_encrypt($user_key, $encrypted, $serverpubkey);
         $rsaenckeyfile = fopen(base_path('resources/keys').'/userkeys.txt', 'a');
         fwrite($rsaenckeyfile, $user->id.','.base64_encode($encrypted)."\n");
         fclose($rsaenckeyfile);
+        //encrypt the user_key with the crypt key
+        UCrypt::setKey($this->generateCrypt($data['password']));
+        $user_key_enc = UCrypt::encrypt($user_key);
         //generate the signing keypair
         $filenames = $this->generateKeypair($user_key);
-        $user->setSecret($user_key);
-        $user->signkeyname_enc = $filenames['privkey'];
-        $user->pubkey = $filenames['pubkey'];
-        $user->save();
-        // $user->setSecret($this->generateCrypt($data['password']));
-        // var_dump($user->key_enc);
-        // $user->setSecret($user_key);
-        // dd($user->signkeyname_enc);
+        UCrypt::setKey($user_key);
+        $signkeyname_enc = UCrypt::encrypt($filenames['privkey']);
+        $pubkeyname = $filenames['pubkey'];
+        //Cache
         Cache::forever($user->id, $user_key);
         Cache::forever($user->id.'priv', $filenames['privkey']);
+        //save rest of data to table
+        $user->registered = true;
+        $user->key_enc = $user_key_enc;
+        $user->signkeyname_enc = $signkeyname_enc;
+        $user->pubkey = $pubkeyname;
+        $user->save();
+        
         return $user;
     }
 
@@ -230,10 +231,10 @@ class AuthController extends Controller
     protected function authenticated(Request $request, User $user)
     {
         //generate key_crypt and set secret
-        $user->setSecret($this->generateCrypt($request->password));
-        $unencryptedkey = $user->key_enc;
-        $user->setSecret($unencryptedkey);
-        $privkeyname = $user->signkeyname_enc;
+        UCrypt::setKey($this->generateCrypt($request->password));
+        $unencryptedkey = UCrypt::decrypt($user->key_enc);
+        UCrypt::setKey($unencryptedkey);
+        $privkeyname = UCrypt::decrypt($user->signkeyname_enc);
         Cache::forever($user->id, $unencryptedkey);
         Cache::forever($user->id.'priv', $privkeyname);
         return redirect()->intended($this->redirectPath());
