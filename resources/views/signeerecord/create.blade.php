@@ -103,7 +103,7 @@ $(function () {
 					$('#messages').append("<p style=\"color:orange\">"+String(data['message']+data['email'])+'</p>');
 				}
 				else if(data['exists']==2) {
-					$('#messages').append("<p style=\"color:red\">Signee "+data['name']+" already added ("+data['email']+")</p>");
+					$('#messages').append("<p style=\"color:red\">Signee with email: "+data['email']+" already added.</p>");
 				}
 				RefreshActionButtons();
             },

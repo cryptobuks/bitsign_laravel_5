@@ -12,7 +12,7 @@ class FileRecord extends Model
 	 * @var array
 	 */
 
-	protected $fillable = ['hash','filename','salt','contract_id'];
+	protected $fillable = ['hash','filename','contract_id', 'type', 'encrypted'];
 
 	/**
      * Get the contract that this filerecord belongs to.

@@ -6,8 +6,9 @@ use Illuminate\Http\Request;
 use Auth;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Contract;
+use App\Signature;
 use App\User;
+use App\Contract;
 use UCrypt;
 use Cache;
 use XmlDSig;
@@ -25,13 +26,42 @@ class SignatureController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of the contracts created by the current user
+     * GET /signatures
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function index($contract_id)
+    public function index()
     {
-        //
+        $auth_user_id = Auth::user()->id;
+        $passphrase = Cache::get($auth_user_id);
+        $privkeypath = storage_path('keys/').Cache::get($auth_user_id.'priv').'.pem';
+        //get the private key
+        $privkeymem = openssl_pkey_get_private(file_get_contents($privkeypath), $passphrase);
+        $mysignatures = Signature::with('contract.creator')->where('signee_id', $auth_user_id)->get();
+        $signatures = array();
+        foreach ($mysignatures as $key => $signature) {
+            //decrypt and assign to $dcrypted_contractkey
+            openssl_private_decrypt($signature->contractkey_enc, $dcrypted_contractkey, $privkeymem);
+            //set whether pending
+            $pending = true;
+            if ($signature->status==true) {
+                $pending = false;
+            }
+            $contract = $signature->contract;
+            $contract_creator = $contract->creator;
+            UCrypt::setKey($dcrypted_contractkey);
+            $signatures[$key] = [
+            'signature_id' => $signature->id,
+            'contract_title'=> Ucrypt::decrypt($contract->title),
+            'contract_type' => $contract->contracttype->name,
+            'contract_creator' =>$contract_creator->f_name.' '.$contract_creator->l_name,
+            'contract_created_at' => $contract->created_at,
+            'pending' => $pending
+            ];
+        }
+        //returns the fetched contracts index
+        return view('signature.index')->withSignatures($signatures);
     }
 
     /**
@@ -64,7 +94,7 @@ class SignatureController extends Controller
      */
     public function store(Request $request)
     {
-        $contract = Contract::find($request->contract_id);
+        $contract = Contract::with('signatures')->find($request->contract_id);
         $user = Auth::user();
         $signeevalidity = $this->isInContract($user->id,$contract);
         if (is_null($user->signkeyname_enc)) {
@@ -121,7 +151,7 @@ class SignatureController extends Controller
             exit(1);
         }
         //get signature
-        $sigrecord = $contract->signatures->where('user_id',$user->id)->first();
+        $sigrecord = $contract->signatures->where('signee_id',$user->id)->first();
         //load priate key to memory
         $privkeymem =  openssl_pkey_get_private(
                 file_get_contents(storage_path('keys/').$privname.'.pem'),
@@ -173,7 +203,7 @@ class SignatureController extends Controller
      */
     protected function isInContract($user_id, Contract $contract)
     {
-        if ($signee = $contract->signatures->where('user_id',$user_id)->first()) {
+        if ($signee = $contract->signatures->where('signee_id',$user_id)->first()) {
             if ($signee->status==false) {
                 return true;
             }
@@ -190,13 +220,13 @@ class SignatureController extends Controller
     protected function getContractData($contract_id)
     {
         $auth_user_id = Auth::user()->id;
-        $contract = Contract::find($contract_id);
+        $contract = Contract::with('signatures.signee.address','filerecords', 'contracttype')->find($contract_id);
         //set filepath
         $filepath = storage_path('contracts/').$contract->id.'/contract.xml';
         //get the contract decryption key
         if ($contract->creator_id != $auth_user_id) {
             $pkeyname = Cache::get($auth_user_id.'priv').'.pem';
-            $pubenc_contractkey = $contract->signatures->where('user_id',$auth_user_id)->first()->contractkey_enc;
+            $pubenc_contractkey = $contract->signatures->where('signee_id',$auth_user_id)->first()->contractkey_enc;
             openssl_private_decrypt(
                 base64_decode($pubenc_contractkey),
                 $dcrypted_contractkey,
@@ -207,28 +237,26 @@ class SignatureController extends Controller
             );
         }
         else {
-            $contract->setSecret(Cache::get($auth_user_id));
-            $dcrypted_contractkey = $contract->key;
+            UCrypt::setKey(Cache::get($auth_user_id));
+            $dcrypted_contractkey = UCrypt::decrypt($contract->key_enc);
         }
         //set the contract data key
-        $contract->setSecret($dcrypted_contractkey);
+        UCrypt::setKey($dcrypted_contractkey);
         //get data and fill in array
         $data['id'] = $contract->id;
-        $data['title'] = $contract->title;
-        $data['body'] = $contract->content;
-        $filerecords = $contract->filerecords;
+        $data['title'] = UCrypt::decrypt($contract->title);
+        $data['body'] = UCrypt::decrypt($contract->content);
         $data['contracttype'] = $contract->contracttype->name;
         $data['key'] = $dcrypted_contractkey;
-        $signatures = $contract->signatures;
         //arrange the signing individuals into parties and fill in $data
-        foreach ($signatures as $signature) {
-            $signee = $signature->user;
+        foreach ($contract->signatures as $signature) {
+            $signee = $signature->signee;
             $saddress = $signee->address;
             $addressstring = $saddress->line_1.', '.$saddress->line_2.', '.$saddress->city.', '.$saddress->state.' '.$saddress->postalcode.', '.$saddress->country;
             $data['parties'][$signature->term][] = [$signee->f_name.' '.$signee->l_name, $addressstring];
         }
         //arrange the filerecord necessary into data
-        foreach ($filerecords as $key=>$filerecord) {
+        foreach ($contract->filerecords as $key=>$filerecord) {
             $data['filerecords'][$key] = [
                 'hash'=>$filerecord->hash,
                 'filename'=>$filerecord->filename,

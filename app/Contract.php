@@ -6,21 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Contract extends Model
 {
-    use Encryption;
     /**
 	 * The parts of the users table that are fillable.
 	 *
 	 * @var array
 	 */
 
-	protected $fillable = ['title','content', 'type'];
-
-    /**
-     * The attributes that are encrypted.
-     *
-     * @var array
-     */
-    protected $encrypted = ['title', 'content', 'key'];
+	protected $fillable = ['title','content','contracttype_id'];
 
 	/**
      * Get the user that created the contract.
@@ -28,7 +20,7 @@ class Contract extends Model
 
 	public function creator()
     {
-        return $this->belongsTo(User::class, 'creator_id');
+        return $this->belongsTo(User::class);
     }
 
     /**
@@ -47,15 +39,6 @@ class Contract extends Model
     public function signatures()
     {
         return $this->hasMany(Signature::class);
-    }
-
-    /**
-     * Get all of the pending signature requests attached to this contract.
-     */
-
-    public function pendingsigrequests()
-    {
-        return $this->hasMany(PendingSigrequest::class);
     }
 
     /**

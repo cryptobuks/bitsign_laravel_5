@@ -32,13 +32,11 @@ class ContractController extends Controller
 	public function index()
 	{
 		$contracts = array();
-		$creator = Auth::user();
-		$secret = Cache::get($creator->id);
-		$contracts_raw = $creator->contracts;
-		foreach ($contracts_raw as $key => $contract) {
+		$auth_user_id = Auth::user()->id;
+		$secret = Cache::get($auth_user_id);
+		foreach (Contract::with('contracttype')->where('creator_id',$auth_user_id)->get() as $key => $contract) {
 			UCrypt::setKey($secret);
-			$contract_key = Ucrypt::decrypt($contract->key);
-			UCrypt::setKey($contract_key);
+			UCrypt::setKey(Ucrypt::decrypt($contract->key_enc));
 			$contracts[$key] = [
 			'id' => $contract->id,
 			'title'=> Ucrypt::decrypt($contract->title),
@@ -83,15 +81,14 @@ class ContractController extends Controller
 	public function edit($id)
 	{
 		//contract data
-		$contract = Contract::find($id);
-		$auth_user_id = Auth::user()->id;
-		if ($contract->creator_id!=$auth_user_id){
+		$contract = Auth::user()->contracts->find($id);
+		if (is_null($contract)){
 			abort(422);
 		}
-		Ucrypt::setKey(Cache::get($auth_user_id));
-		Ucrypt::setKey(Ucrypt::decrypt($contract->key));
+		Ucrypt::setKey(Cache::get($contract->creator_id));
+		Ucrypt::setKey(Ucrypt::decrypt($contract->key_enc));
 		$data = array('title' => Ucrypt::decrypt($contract->title), 'content' => Ucrypt::decrypt($contract->content));
-		return view('contracts.create')->withData($data)->withPosturl('contracts/'.$contract->id);
+		return view('contracts.create')->withData($data)->withPosturl('contracts/'.$id);
 	}
 
 	/**
@@ -106,36 +103,35 @@ class ContractController extends Controller
 	{
 		$this->validate($request, [
 			//if increasing the max size, also increase database
-        'contract_title' => 'required|unique:contracts,title|max:40',
+        'contract_title' => 'required|max:40',
         'contract_content' => 'required',
         'contract_type' => 'exists:contract_types,id',
     	]);
 
-		// get input
+		// set creator id
  		$creator_id = Auth::user()->id;
-        $contract_title = $request->contract_title;
-        $contract_content = $request->contract_content;
-
+        // generate this contract's key
         $contract_key = str_random(32);
+        //encrypt contract key
+        UCrypt::setKey(Cache::get($creator_id));
+        $contractkey_enc = UCrypt::encrypt($contract_key);
+        //encrypt contract title and content with contract key
+        UCrypt::setKey($contract_key);
+        $contract_title = UCrypt::encrypt($request->contract_title);
+        $contract_content = UCrypt::encrypt($request->contract_content);
         // store in database
-        $contract = new Contract;
-        $contract->setSecret(Cache::get($creator_id));
+        $contract = Contract::create([
+        	'title' => $contract_title,
+        	'content' => $contract_content
+        	]);
         $contract->creator_id = $creator_id;
         $contract->contracttype_id = $request->contract_type;
-        $contract->key = $contract_key;
-        $contract->save();
-        $contract_id = $contract->getKey();
-        //save the encrypted stuff
-        //new object
-        $contract = Contract::find($contract_id);
-        $contract->setSecret($contract_key);
-        $contract->title = $contract_title;
-        $contract->content = $contract_content;
+        $contract->key_enc = $contractkey_enc;
         $contract->save();
  
         $response = array(
             'status' => 'success',
-            'contract_id' => $contract_id
+            'contract_id' => $contract->id
         );
  
         return response()->json( $response );
@@ -158,18 +154,19 @@ class ContractController extends Controller
     	]);
 
 		// get input
- 		$auth_user_id = Auth::user()->id;
+ 		$contract = Auth::user()->contracts->find($id);
         $contract_title = $request->contract_title;
         $contract_content = $request->contract_content;
         
+        if (is_null($contract)) {
+        	abort(422);
+        }
         //save the encrypted stuff
-        //new object
-        $contract = Contract::find($id);
-        UCrypt::setKey(Cache::get($auth_user_id));
-        $contract->setSecret(UCrypt::decrypt($contract->key));
-        if ($contract->title != $contract_title || $contract->content != $contract_content) {
-        	$contract->title = $contract_title;
-	        $contract->content = $contract_content;
+        UCrypt::setKey(Cache::get($contract->creator_id));
+        UCrypt::setKey(UCrypt::decrypt($contract->key_enc));
+        if (UCrypt::decrypt($contract->title) != $contract_title || UCrypt::decrypt($contract->content) != $contract_content) {
+        	$contract->title = UCrypt::encrypt($contract_title);
+	        $contract->content = UCrypt::encrypt($contract_content);
 	        $contract->hash = '';
 	        $contract->save();
         }
