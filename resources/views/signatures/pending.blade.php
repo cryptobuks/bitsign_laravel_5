@@ -13,7 +13,7 @@
 			<div class="box-header">
 				<div class="box-name">
 					<i class="fa fa-file-text-o"></i>
-					<span>{{$pagetitle}}</span>
+					<span>Pending Signatures</span>
 				</div>
 				<div class="box-icons">
 					<a class="collapse-link">

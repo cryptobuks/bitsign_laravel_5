@@ -119,7 +119,7 @@
 					</a>
 					<ul class="dropdown-menu">
 						<li><a class="ajax-link" href="signatures/pending">Pending</a></li>
-						<li><a class="ajax-link" href="signatures/completed">Completed</a></li>
+						<li><a class="ajax-link" href="signatures/signed">Completed</a></li>
 						<li><a class="ajax-link" href="ajax/new_signature_1.html">Sign New Contract</a></li>
 					</ul>
 				</li>
