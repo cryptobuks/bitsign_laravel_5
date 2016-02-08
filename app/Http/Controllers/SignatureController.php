@@ -41,12 +41,12 @@ class SignatureController extends Controller
         switch ($status) {
             case 'pending':
                 $mysignatures = Signature::with('contract.creator')->where(['signee_id' => $auth_user_id, 'status' => false])->get();
-                $pagetitle = 'Pending Signatures';
+                $view = 'signatures.pending';
                 break;
             
-            case 'completed':
+            case 'signed':
                 $mysignatures = Signature::with('contract.creator')->where(['signee_id' => $auth_user_id, 'status' => true])->get();
-                $pagetitle = 'Completed Signatures';
+                $view = 'signatures.signed';
                 break;
         }
         $signatures = array();
@@ -67,7 +67,7 @@ class SignatureController extends Controller
             }
         }
         //returns the fetched contracts index
-        return view('signature.index')->withSignatures($signatures)->withPagetitle($pagetitle);
+        return view($view)->withSignatures($signatures);
     }
 
     /**

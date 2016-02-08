@@ -15,7 +15,7 @@ class Address extends Model
 	protected $fillable = [];
 
 	/**
-     * Get the user whose addres this is.
+     * Get the user whose address this is.
      */
 
 	public function user()
