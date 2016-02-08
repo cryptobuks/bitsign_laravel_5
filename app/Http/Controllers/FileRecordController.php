@@ -73,8 +73,9 @@ class FileRecordController extends Controller
 	    }
 	    $currentfilecount = count($currentfilehashes);
 
-		//Set the upload parameters
+		//Set the upload parameters and one finfo object
 		$assetPath = storage_path('contracts/'.$contract->id.'/files');
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 
 		//Get files from POST Input, and cast single file to array
 		$all_uploads = $request->file('files'); // your file upload input field in the form should be named 'files' or 'files[]'
@@ -104,7 +105,7 @@ class FileRecordController extends Controller
 					//hash
 				 	$shafile = base64_encode(hash_file('sha384', $assetPath.'/'.$filename, true));
 				 	//get mimetype
-				 	$mimetype = mime_content_type($assetPath.'/'.$filename);
+				 	$mimetype = finfo_file($finfo, $assetPath.'/'.$filename);
 				 	//check whether file already exists for this contract
 				 	if (array_search($shafile, $currentfilehashes) !== false) {
 				 		$errors[] = 'File ' . $upload->getClientOriginalName() . ' has already been added to this contract';
