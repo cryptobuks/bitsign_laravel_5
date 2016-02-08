@@ -35,7 +35,7 @@ Route::post('addaddress', 'Auth\AuthController@postAddAddress');
 /*Routing for Contracts Controller*/
 
 Route::resource('contracts', 'ContractController', 
-array('only' => array('index', 'create', 'edit', 'store')));
+array('only' => array('index', 'create', 'edit', 'store', 'show')));
 Route::post('contracts/{id}', ['uses' => 'ContractController@update']);
 
 /*Routing for File Controller*/
