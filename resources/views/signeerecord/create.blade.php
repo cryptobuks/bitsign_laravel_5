@@ -114,7 +114,7 @@ $(function () {
 	});
 	//navigation buttons
     $("#btnNext").click(function(){
-    	var ajax_url = 'sign/' + '{{$contract_id}}';
+    	var ajax_url = 'contracts/' + '{{$contract_id}}';
     	window.location.hash = ajax_url;
 		LoadAjaxContent(ajax_url);
     });
