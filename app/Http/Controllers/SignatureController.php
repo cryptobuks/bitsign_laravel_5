@@ -31,37 +31,43 @@ class SignatureController extends Controller
      *
      * @return Response
      */
-    public function index()
+    public function index($status)
     {
         $auth_user_id = Auth::user()->id;
         $passphrase = Cache::get($auth_user_id);
         $privkeypath = storage_path('keys/').Cache::get($auth_user_id.'priv').'.pem';
         //get the private key
         $privkeymem = openssl_pkey_get_private(file_get_contents($privkeypath), $passphrase);
-        $mysignatures = Signature::with('contract.creator')->where('signee_id', $auth_user_id)->get();
+        switch ($status) {
+            case 'pending':
+                $mysignatures = Signature::with('contract.creator')->where(['signee_id' => $auth_user_id, 'status' => false])->get();
+                $pagetitle = 'Pending Signatures';
+                break;
+            
+            case 'completed':
+                $mysignatures = Signature::with('contract.creator')->where(['signee_id' => $auth_user_id, 'status' => true])->get();
+                $pagetitle = 'Completed Signatures';
+                break;
+        }
         $signatures = array();
-        foreach ($mysignatures as $key => $signature) {
-            //decrypt and assign to $dcrypted_contractkey
-            openssl_private_decrypt($signature->contractkey_enc, $dcrypted_contractkey, $privkeymem);
-            //set whether pending
-            $pending = true;
-            if ($signature->status==true) {
-                $pending = false;
+        if ($mysignatures instanceof \Illuminate\Database\Eloquent\Collection) {
+            foreach ($mysignatures as $key => $signature) {
+                //decrypt and assign to $dcrypted_contractkey
+                openssl_private_decrypt(base64_decode($signature->contractkey_enc), $dcrypted_contractkey, $privkeymem);
+                $contract = $signature->contract;
+                $contract_creator = $contract->creator;
+                UCrypt::setKey($dcrypted_contractkey);
+                $signatures[$key] = [
+                'signature_id' => $signature->id,
+                'contract_title'=> Ucrypt::decrypt($contract->title),
+                'contract_type' => $contract->contracttype->name,
+                'contract_creator' =>$contract_creator->f_name.' '.$contract_creator->l_name,
+                'contract_created_at' => $contract->created_at
+                ];
             }
-            $contract = $signature->contract;
-            $contract_creator = $contract->creator;
-            UCrypt::setKey($dcrypted_contractkey);
-            $signatures[$key] = [
-            'signature_id' => $signature->id,
-            'contract_title'=> Ucrypt::decrypt($contract->title),
-            'contract_type' => $contract->contracttype->name,
-            'contract_creator' =>$contract_creator->f_name.' '.$contract_creator->l_name,
-            'contract_created_at' => $contract->created_at,
-            'pending' => $pending
-            ];
         }
         //returns the fetched contracts index
-        return view('signature.index')->withSignatures($signatures);
+        return view('signature.index')->withSignatures($signatures)->withPagetitle($pagetitle);
     }
 
     /**

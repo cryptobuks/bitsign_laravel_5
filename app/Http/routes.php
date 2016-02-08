@@ -55,3 +55,4 @@ Route::get('signeerecord/{id}/delete', ['uses' => 'SigneeRecordController@destro
 /*Routing for Signature Controller*/
 Route::get('sign/{contract_id}', 'SignatureController@create');
 Route::post('sign', 'SignatureController@store');
+Route::get('signatures/{status}', 'SignatureController@index');
