@@ -1,0 +1,346 @@
+/* Style for the page layout */
+
+body {
+	font-family: 'Roboto', sans-serif;
+}
+
+.content-holder {
+	background: $bg;
+	@include transition(.3s);
+}
+.mdl-layout {
+	min-height: 100vh;
+	height: initial;
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+.mdl-layout__content {
+	overflow: hidden;
+}
+.page-content {
+	padding: 15px;	
+	padding-left : 95px;	
+	max-width: 1280px;
+	margin: 0 auto;	
+	padding-top: 85px;
+}
+
+.profile-content {
+	margin-left: 80px;
+}
+
+/* Styles for extended layout */
+
+.extended {
+	.navbar {
+		margin-left: 210px;
+		width: calc(100% - 210px);
+	}
+
+	.sidebar {
+		width: 290px;
+		overflow: hidden; 
+		position: fixed;
+		.top-logo {
+			display: none;
+		}
+		.top-logo-extended {
+			display: block;
+			height: 55px;
+			position: fixed;
+			width: 290px;
+			z-index: 5;
+			padding-top: 15px;
+			font-size: 25px;
+			text-align: center;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			color: white;
+			background: $primary;
+			opacity: 1;
+			@include transition(.2s);
+			.smaller {
+				font-size: 16px;
+				letter-spacing: 5px;
+				font-weight: 100;
+			} 
+		}
+		.scrollbar {
+			margin-top: 70px;
+		}
+		.user-info {
+			.opacity {
+				background:rgba(0, 0, 0, 0.5);
+				img.sidebar-profile {
+					width: 75px;
+					margin-top: 50px;
+					margin-left: 30px;
+				}
+				.info {
+					color: white;
+					font-size: 18px;
+					vertical-align: middle;
+					position: absolute;
+					top: 65px;
+					right: 25px;
+					display: inline-block;
+					opacity: 1;	
+					.smaller {
+						font-size: 14px;
+						font-weight: 100;
+					}
+					.pen {
+						position: absolute;
+						top: 80px;
+						right: -5px;
+						a {
+							color: white;
+							font-size: 22px;
+						}
+					}
+				}
+			}
+		}
+		.dashboard-menu {
+        	ul.menu-list {
+    			li {    	
+    				height: initial;
+    				min-height: 50px;	    						
+    				a {
+    					display: block;
+    					span.text {
+    						display: inline-block;
+    						width: auto;
+    					}
+    					text-transform: none;
+    					color: white;
+    					font-weight: 300;
+    					text-align: left; 
+    					height: 100%;
+    					font-size: 17px;
+    					padding-top: 6px;
+    					padding-bottom: 8px;
+    					.mdi {
+    						font-size: 20px;
+    						margin-left: 10px;
+    						margin-right: 10px;
+    					}
+    					.mdi-chevron-down {
+    						float: right;
+    						display: inline-block;
+    					}    					
+    				}
+    				&.active {
+    					a {
+    						padding-left: 5px !important;
+    					}
+    				}
+    			}
+    			ul.sub-menu {
+    				position: static;    				
+    				opacity: 0;
+    				max-height: 0;
+    				padding-left: 0;
+    				list-style-type: none;
+    				width: 100%;
+    				display: block !important;
+    				overflow: hidden;
+    				background: darken($primary, 5%);
+    				@include transition(.4s);
+    				&.visible {
+    					opacity: 1;
+    					max-height: 300px;
+    					
+    				}
+    				li {
+    					height: 40px;
+    					min-height: 40px;
+    					&:hover {
+							background: darken($primary, 10%) !important;
+						}
+    					a {
+							font-size: 15px;
+							height: 40px;
+							padding-left: 2.5em !important;
+							width: 100%;
+							padding-top: 3px;;
+							display: block;
+							padding-bottom: 0;
+							&:hover {
+								background: initial !important;
+							}
+    					}
+    					&.active {
+    						border-left: 4px solid lighten($primary, 25%);
+							a {
+								border-left: none !important;
+							}
+    					}
+    				}
+					li:before {
+					    content: "• ";
+					    color: lighten($primary, 25%); 
+					    position: absolute;
+					    top: 11px;
+					    left: 20px;
+					    font-size: 2.5em;
+					}
+    			}
+        	}
+        }
+	}
+
+	.content-holder {
+		margin-left: 210px;
+	}
+}
+
+/* Styles for RTL */
+
+.rtl {
+	* {
+		direction: rtl;
+	}
+	.sidebar {
+		right: 0;
+		left: initial;
+		.dashboard-menu {
+			ul.menu-list {
+				padding-left: initial;
+				padding-right: 0;
+				li {
+					a {
+						padding-left: 15px;	
+						direction: ltr;	
+						position: absolute;	
+						min-width: 56px;				
+					}
+					&.active {
+						a {
+							position: initial;
+						}
+					}
+				}
+				ul.sub-menu {
+					padding-left: initial;
+					padding-right: 0;
+					right: 80px;
+					li {
+						a {
+							width: 195px;
+						}
+					}
+				}
+			}
+		}
+	}
+	.navbar {
+		margin-left: initial;
+		margin-right: 80px;
+		.right {
+			float: left;
+		}
+	}
+	.page-content {
+		padding-left: initial;
+		padding-right: 95px;
+	}
+	.profile-content {
+		margin-left: initial;
+		margin-right: -15px;
+	}
+	&.extended {
+		.navbar {
+			margin-left: initial;
+			margin-right: 290px;
+		}
+		.content-holder {
+			margin-left: initial;
+			margin-right: 210px;
+		}
+		.sidebar {
+			.user-info {
+				.opacity {
+					direction: ltr;					
+				}
+			}
+			.dashboard-menu {
+				ul.menu-list {
+					padding-left: initial;
+					padding-right: 0;
+					li {
+						a {
+							padding-left: 15px;	
+							direction: ltr;	
+							position: initial;					
+						}
+						&.active {
+							a {
+								padding-left: 15px !important;
+							}
+						}
+					}
+					ul.sub-menu {
+						padding-left: initial;
+						padding-right: 0;
+						right: 80px;
+						li {
+							a {
+								width: 235px;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	.panel-header {
+		.cog {
+			right: initial;
+			left: 10px;
+		}
+	}
+	.to-do {
+		.md-button {
+			float: left;
+		}
+	}
+	.expandedContainer {
+		padding-right: initial !important;
+		.profile-content {
+			margin-left: initial;
+			margin-right: 80px;
+		}
+	}
+	@media screen and (max-width: 839px) {
+		.sidebar {
+			right: -235px;
+		}
+		.navbar {
+			margin-right: 0;
+		}		
+		.page-content {
+		    padding-right: 15px;
+		}
+		&.extended {
+			.sidebar {
+				right: 0;
+				left: initial !important;
+			}
+			.navbar {
+				margin-right: 210px;
+			}
+			&.small-sidebar {
+				.page-content {
+					margin-right: initial !important;				 	
+				}
+				.profile-content {
+					margin-right: -15px !important;
+					.buttons {
+						display: none;
+					}
+				}
+			}
+		}
+	}
+}
