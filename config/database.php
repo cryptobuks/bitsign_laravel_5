@@ -55,7 +55,7 @@ return [
         'mysql' => [
             'driver'    => 'mysql',
             'host'      => 'localhost',
-            'database'  => 'bitsign_test',
+            'database'  => 'bitsign_pushtree',
             'username'  => 'root',
             'password'  => '12345',
             'charset'   => 'utf8',

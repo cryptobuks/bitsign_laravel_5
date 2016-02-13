@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Material Laravel Dashboard | @yield('page_title')</title>
+	<title>Bitsign.it | @yield('page_title')</title>
 
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">

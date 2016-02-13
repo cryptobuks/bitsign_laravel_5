@@ -12,7 +12,7 @@
                 <span>toggle menu</span>
             </button>
             <div class="responsive-logo">
-                Material <br><span class="smaller">Dashboard</span>
+                BitSign.it <br><span class="smaller">Dashboard</span>
             </div>
             <nav class="mdl-navigation mdl-layout--large-screen-only">
                 <!-- Left aligned menu below button -->
@@ -100,7 +100,7 @@
             M
         </div>
         <div class="top-logo-extended">
-            Material <br/> <span class="smaller">dashboard</span>
+            BitSign.it <br/> <span class="smaller">dashboard</span>
         </div>
         <div class="scrollbar" id="scroll">
             <div class="user-info">

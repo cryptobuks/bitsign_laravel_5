@@ -68,6 +68,10 @@ Route::get('signatures/{status}', 'SignatureController@index');
 |
 */
 
+Route::get('/home', function () {
+    return view('home');
+});
+
 Route::get('/login', function () {
     return view('pages.login');
 });

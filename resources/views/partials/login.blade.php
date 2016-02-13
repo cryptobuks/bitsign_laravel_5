@@ -4,7 +4,7 @@
 
 	<div class="login-overlay">
 		<div class="logo">
-			Material <br> <span class="smaller">Dashboard</span>
+			BitSign.it <br> <span class="smaller">Dashboard</span>
 		</div>
 		<div class="form-container shadow">
 			<div class="icon">
