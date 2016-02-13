@@ -138,27 +138,27 @@ function LoadKnobScripts(callback){
 //
 //  Function for load content from url and put in $('.ajax-content') block
 //
-function LoadAjaxContent(url){
-	$('.preloader').show();
-	$.ajax({
-		mimeType: 'text/html; charset=utf-8', // ! Need set mimeType only when run from local file
-		url: url,
-		type: 'GET',
-		success: function(data) {
-			$('#ajax-content').html(data);
-			$('.preloader').hide();
-		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			console.log(errorThrown);
-		},
-		statusCode: {
-		    401: function() {
-		      $(location).attr("href", 'auth/login');
-		    }
-		},
-		dataType: "html"
-	});
-}
+// function LoadAjaxContent(url){
+// 	$('.preloader').show();
+// 	$.ajax({
+// 		mimeType: 'text/html; charset=utf-8', // ! Need set mimeType only when run from local file
+// 		url: url,
+// 		type: 'GET',
+// 		success: function(data) {
+// 			$('#ajax-content').html(data);
+// 			$('.preloader').hide();
+// 		},
+// 		error: function (jqXHR, textStatus, errorThrown) {
+// 			console.log(errorThrown);
+// 		},
+// 		statusCode: {
+// 		    401: function() {
+// 		      $(location).attr("href", 'auth/login');
+// 		    }
+// 		},
+// 		dataType: "html"
+// 	});
+// }
 //
 //  Function for create 2 dates in human-readable format (with leading zero)
 //
@@ -475,11 +475,11 @@ $(document).ready(function () {
 		$('div#main').toggleClass('sidebar-show');
 		setTimeout(MessagesMenuWidth, 250);
 	});
-	var ajax_url = location.hash.replace(/^#/, '');
-	if (ajax_url.length < 1) {
-		ajax_url = 'dashboard/index';
-	}
-	LoadAjaxContent(ajax_url);
+	// var ajax_url = location.hash.replace(/^#/, '');
+	// if (ajax_url.length < 1) {
+	// 	ajax_url = 'dashboard/index';
+	// }
+	// LoadAjaxContent(ajax_url);
 	$('.main-menu').on('click', 'a', function (e) {
 		var parents = $(this).parents('li');
 		var li = $(this).closest('li.dropdown');

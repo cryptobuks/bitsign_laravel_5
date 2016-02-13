@@ -89,7 +89,7 @@
 </header>
 <!--End Header-->
 <!--Start Container-->
-<div id="main" class="container-fluid">
+<div id="main" class="container-fluid" ng-app="app">
 	<div class="row">
 		<div id="sidebar-left" class="col-xs-2 col-sm-2">
 			<ul class="nav main-menu">
@@ -107,7 +107,7 @@
 						 <span class="hidden-xs">Intellectual Property</span>
 					</a>
 					<ul class="dropdown-menu">
-						<li><a class="ajax-link" href="ip/create">Create Record</a></li>
+						<li><a ui-sref-active="active" ui-sref="createip">Create Record</a></li>
 						<li><a class="ajax-link" href="ip/share">Secure Share</a></li>
 						<li><a class="ajax-link" href="ip/sell">Sell for Bitcoin</a></li>
 					</ul>
@@ -149,10 +149,7 @@
 		</div>
 		<!--Start Content-->
 		<div id="content" class="col-xs-12 col-sm-10">
-			<div class="preloader">
-				<img src="img/devoops_getdata.gif" class="devoops-getdata" alt="preloader"/>
-			</div>
-			<div id="ajax-content"></div>
+			<div ui-view></div>
 		</div>
 		<!--End Content-->
 	</div>
@@ -162,6 +159,11 @@
 <!--<script src="http://code.jquery.com/jquery.js"></script>-->
 <script src="plugins/jquery/jquery.min.js"></script>
 <script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+<!-- Angularize -->
+<script src="lib/angular/angular.js"></script>
+<script src="lib/angular-ui/build/angular-ui.js"></script>
+<script src="lib/angular-ui-router/release/angular-ui-router.min.js"></script>
+<script src="js/app.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="plugins/bootstrap/bootstrap.min.js"></script>
 <script src="plugins/tinymce/tinymce.min.js"></script>

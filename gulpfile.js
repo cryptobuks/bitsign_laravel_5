@@ -15,14 +15,14 @@ elixir(function(mix) {
 
     /* Copy fonts */
 
-    mix.copy('bower_components/mdi/fonts', 'public/fonts');
+    mix.copy('public/lib/mdi/fonts', 'public/fonts');
 
     /* Copy images */
 
     mix.copy('resources/assets/images', 'public/images');
     mix.copy('resources/assets/favicon.ico', 'public');
-    mix.copy('bower_components/material-design-lite/src/images', 'public/images');
-    mix.copy('bower_components/lightbox2/dist/images', 'public/images');
+    mix.copy('public/lib/material-design-lite/src/images', 'public/images');
+    mix.copy('public/lib/lightbox2/dist/images', 'public/images');
 
     /* Copying custom styles to the public folder */
 
@@ -54,34 +54,34 @@ elixir(function(mix) {
     /* Copying all the styles to the public folder */
 
     mix.styles([
-        'bower_components/mdi/css/materialdesignicons.min.css',
-        'bower_components/c3/c3.min.css',
-        'bower_components/dragula.js/dist/dragula.min.css',
-        'bower_components/lightbox2/dist/css/lightbox.css',
+        'public/lib/mdi/css/materialdesignicons.min.css',
+        'public/lib/c3/c3.min.css',
+        'public/lib/dragula.js/dist/dragula.min.css',
+        'public/lib/lightbox2/dist/css/lightbox.css',
         'resources/assets/css/paper-collapse.min.css',
-        'bower_components/remodal/dist/remodal.css',
-        'bower_components/remodal/dist/remodal-default-theme.css',
-        'bower_components/animsition/dist/css/animsition.min.css',
-        'bower_components/perfect-scrollbar/css/perfect-scrollbar.min.css',
-        'bower_components/growl/stylesheets/jquery.growl.css'
+        'public/lib/remodal/dist/remodal.css',
+        'public/lib/remodal/dist/remodal-default-theme.css',
+        'public/lib/animsition/dist/css/animsition.min.css',
+        'public/lib/perfect-scrollbar/css/perfect-scrollbar.min.css',
+        'public/lib/growl/stylesheets/jquery.growl.css'
     ], 'public/css/vendor.css', './');
 
     /* Copying all the scripts to the public folder */
 
     mix.scripts([
-        'bower_components/material-design-lite/material.min.js',
-        'bower_components/jquery/dist/jquery.min.js',
-        'bower_components/jquery.easy-pie-chart/dist/jquery.easypiechart.min.js',
-        'bower_components/chartjs/Chart.min.js',
-        'bower_components/d3/d3.min.js',
-        'bower_components/c3/c3.min.js',
-        'bower_components/dragula.js/dist/dragula.min.js',
-        'bower_components/lightbox2/dist/js/lightbox.min.js',
+        'public/lib/material-design-lite/material.min.js',
+        'public/lib/jquery/dist/jquery.min.js',
+        'public/lib/jquery.easy-pie-chart/dist/jquery.easypiechart.min.js',
+        'public/lib/chartjs/Chart.min.js',
+        'public/lib/d3/d3.min.js',
+        'public/lib/c3/c3.min.js',
+        'public/lib/dragula.js/dist/dragula.min.js',
+        'public/lib/lightbox2/dist/js/lightbox.min.js',
         'resources/assets/js/paper-collapse.min.js',
-        'bower_components/remodal/dist/remodal.min.js',
-        'bower_components/animsition/dist/js/jquery.animsition.min.js',
-        'bower_components/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js',
-        'bower_components/growl/javascripts/jquery.growl.js'
+        'public/lib/remodal/dist/remodal.min.js',
+        'public/lib/animsition/dist/js/jquery.animsition.min.js',
+        'public/lib/perfect-scrollbar/js/min/perfect-scrollbar.jquery.min.js',
+        'public/lib/growl/javascripts/jquery.growl.js'
     ],  'public/js/vendor.js', './');
 
     /* Livereload */

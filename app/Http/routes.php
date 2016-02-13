@@ -11,12 +11,11 @@
 |
 */
 
-Route::get('/', 'HomeController@index');
+Route::get('/', 'ViewController@loadView');
 
 /* Dash View Loader */
 
-Route::get('dashboard', 'DashController@showDash');
-Route::get('dashboard/index', 'DashController@index');
+Route::get('home', 'ViewController@home');
 
 // Authentication Routes...
 Route::get('auth/login/{provider?}', 'Auth\AuthController@getLogin');
@@ -68,9 +67,9 @@ Route::get('signatures/{status}', 'SignatureController@index');
 |
 */
 
-Route::get('/home', function () {
-    return view('home');
-});
+// Route::get('/home', function () {
+//     return view('home');
+// });
 
 Route::get('/login', function () {
     return view('pages.login');

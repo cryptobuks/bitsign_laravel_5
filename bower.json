@@ -22,6 +22,9 @@
     "mdi": "~1.1.70",
     "perfect-scrollbar": "~0.6.5",
     "remodal": "~1.0.2",
-    "weather-icons": "~2.0.4"
+    "weather-icons": "~2.0.4",
+    "angular": "^1.5.0",
+    "angular-ui": "^0.4.0",
+    "angular-ui-router": "^0.2.18"
   }
 }
