@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE contract SYSTEM "eContracts-s-bitsign.dtd">
+<contract xmlns="urn:oasis:names:tc:eContracts:1:0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xi="http://www.w3.org/2001/XInclude">
+	<metadata>
+		<dc:subject>Proof of Creation</dc:subject>
+		<dc:publisher>BITSIGN.IT</dc:publisher>
+		<dc:language>en</dc:language>
+	</metadata>
+	<title><text xml:id="title">
+	</text>
+	</title>
+	<contract-front>
+		<date-block>
+			<date></date>
+		</date-block>
+		<parties><title><text>Parties</text></title>
+		</parties>
+	</contract-front>
+	<body>
+		<block>
+			<definition>
+				<terms>
+					<term>The Creators</term>
+				</terms>
+				<block>
+					<text>means the individual or individuals who created the intellectual property described in this contract.
+					</text>
+				</block>
+				<terms>
+					<term>The Blockchain</term>
+				</terms>
+				<block>
+					<text>means the trustless decentralized peer to peer network publicly known as the "Bitcoin Blockchain", described in the bitcoin specification (https://bitcoin.org/bitcoin.pdf).
+					</text>
+				</block>
+				<terms>
+					<term>The Signees</term>
+				</terms>
+				<block>
+					<text>means the individual or individuals who sign the contents of this contract, by either
+					<block><item number="1">giving the authority (by entering a password confirmation) to the web services hosted at https://www.bitsign.it to sign a representation of this contract's contents according to the XML Digital Signature Specification using an encrypted private key stored on the server(s) associated with aforementioned web services(https://www.w3.org/TR/xmldsig-core/).</item>
+					<item number="2">recording a multimedia message/file in which they verbally agree to be bound by the terms of this contract, and in which they clearly display (as a picture, text or recorded sound) a representation of this contract's contents (sha384 hashed digest) and providing this multimedia message/file to the web services hosted at https://www.bitsign.it</item>
+					</block>
+					</text>
+				</block>
+			</definition>
+		</block>
+		<block>
+			<html xml:id="contract-content"></html>
+		</block>
+	</body>
+	<attachments>
+	</attachments>
+</contract>

@@ -2,8 +2,8 @@
 	<div id="breadcrumb" class="col-md-12">
 		<ol class="breadcrumb">
 			<li><a href="dashboard">Dashboard</a></li>
-			<li><a href="#">Contracts</a></li>
-			<li><a href="#">New Contract</a></li>
+			<li><a href="#">{{$type['parent']}}</a></li>
+			<li><a href="#">New {{$type['name']}}</a></li>
 		</ol>
 	</div>
 </div>
@@ -13,7 +13,7 @@
 			<div class="box-header">
 				<div class="box-name">
 					<i class="fa fa-pencil"></i>
-					<span>Create a New Contract</span>
+					<span>Create new {{$type['name']}}</span>
 				</div>
 				<div class="box-icons">
 					<a class="collapse-link">
@@ -29,7 +29,7 @@
 				<div class="no-move"></div>
 			</div>
 			<div class="box-content">
-				<h4 class="page-header">New Contract</h4>
+				<h4 class="page-header">New {{$type['name']}}</h4>
 				<form class="form-horizontal" role="form" method="post" action="{{$posturl}}" id="form-add-a-contract">
 					<div class="form-group">
 						<label class="col-sm-2 control-label" for="contract_title">Contract Title:</label>
@@ -54,7 +54,7 @@
 						</div>
 					</div>
 					<input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
-					<input type="hidden" name="contract_type" value="1">
+					<input type="hidden" name="contract_type" value="{{$type['id']}}">
 				</form>
 			</div>
 		</div>

@@ -60,4 +60,20 @@ class User extends Model implements AuthenticatableContract,
     {
         return $this->hasOne(Address::class);
     }
+
+    // /**
+    //  * Get all of the user's tokens (used by other functionsin this model).
+    //  */
+    // public function dropboxtoken()
+    // {
+    //     return $this->tokens()->where('service', 'dropbox');
+    // }
+
+    /**
+     * Get all of the user's tokens (used by other functions in this model).
+     */
+    public function tokens()
+    {
+        return $this->hasMany(Token::class, 'owner_id');
+    }
 }

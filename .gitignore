@@ -6,5 +6,4 @@ Homestead.json
 storage/contracts/
 storage/keys/
 composer.lock
-bower_components/
 public/lib/

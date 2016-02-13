@@ -21,8 +21,9 @@ class Signature extends Model
      * Get the user that created this signature.
      */
 
-	public function signee()
+
+	public function details()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'signee_id');
     }
 }

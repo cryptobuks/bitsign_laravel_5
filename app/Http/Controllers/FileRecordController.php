@@ -32,12 +32,18 @@ class FileRecordController extends Controller
 	 */
 	public function create($contract_id)
 	{
-		$filerecords = Auth::user()->contracts->find($contract_id)->filerecords;
+		$auth_user_id = Auth::user()->id;
+		$contract = Contract::with('contractType', 'filerecords')->find($contract_id);
+		if ($contract->creator_id != $auth_user_id) {
+			abort(422);
+		}
+		$filerecords = $contract->filerecords;
+		$contracttype = $contract->contractType;
 		//takes doc_id and appends to data array, then redirects to file import page
 		$data = array(
     	'contract_id'  => $contract_id,
-    	'subheading1'   => 'Contracts',
-    	'subheading2' => 'Create Contract',
+    	'subheading1'   => $contracttype->parent,
+    	'subheading2' => 'Create '.$contracttype->name,
     	'subheading3' => 'Attach Files'
 		);
 
@@ -90,7 +96,7 @@ class FileRecordController extends Controller
 	    // Loop through all uploaded files
 	    foreach ($all_uploads as $upload) {
 		 	if ($currentfilecount >= 10) {
-		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed)';
+		 		$errors[] = 'File limit exceeded for this contract (Maximum 10 allowed!)';
 		 		break;
 		 	}
 	        $validator = Validator::make(

@@ -2130,6 +2130,13 @@ border-radius: 50%;}
   position: fixed;
   width: 50%;
 }
+.clause-content{
+  background: white;
+  border: 2px solid gray;
+}
+.clause-label {
+    background: gray;
+}
 .fancybox-close {
   position: fixed;
   top: 20px;

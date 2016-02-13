@@ -3,15 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Auth;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+
+use Auth;
 use App\Signature;
 use App\User;
 use App\Contract;
 use UCrypt;
 use Cache;
 use XmlDSig;
+
+use Mail;
+use App\Packages\Blockcypher;
 
 class SignatureController extends Controller
 {
@@ -29,7 +33,7 @@ class SignatureController extends Controller
      * Display a listing of the contracts created by the current user
      * GET /signatures
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function index($status)
     {
@@ -45,7 +49,7 @@ class SignatureController extends Controller
                 break;
             
             case 'signed':
-                $mysignatures = Signature::with('contract.creator')->where(['signee_id' => $auth_user_id, 'status' => true])->get();
+                $mysignatures = Signature::with('contract.creator', 'contract.contractType')->where(['signee_id' => $auth_user_id, 'status' => true])->get();
                 $view = 'signatures.signed';
                 break;
         }
@@ -60,7 +64,7 @@ class SignatureController extends Controller
                 $signatures[$key] = [
                 'signature_id' => $signature->id,
                 'contract_title'=> Ucrypt::decrypt($contract->title),
-                'contract_type' => $contract->contracttype->name,
+                'contract_type' => $contract->contractType->name,
                 'contract_creator' =>$contract_creator->f_name.' '.$contract_creator->l_name,
                 'contract_created_at' => $contract->created_at
                 ];
@@ -71,34 +75,45 @@ class SignatureController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for adding signees.
      *
      * @return \Illuminate\Http\Response
      */
     public function create($contract_id)
     {
-        //get contract data
-        $contract_data = $this->getContractData($contract_id);
-        //takes doc_id and appends to data array, then redirects to signature page
-
+        $auth_user_id = Auth::user()->id;
+        $contract = Contract::with('signatures.details')->where('creator_id', $auth_user_id)->find($contract_id);
+        $contract = Auth::user()->contracts->find($contract_id);
+        if (is_null($contract)) {
+            abort(422);
+        }
+        //takes doc_id and appends to data array, then redirects to file import page
         $data = array(
-        'contract_data'  => $contract_data,
+        'contract_id'  => $contract_id,
         'subheading1'   => 'Contracts',
-        'subheading2' => 'Sign Contract',
-        'subheading3' => 'Sign'
+        'subheading2' => 'Create Contract',
+        'subheading3' => 'Add Signees'
         );
+        
+        if ($signatures = $contract->signatures) {
+            foreach ($signatures as $signature) {
+                $signeedets = $signature->details;
+                $data['signeerecords'][] = ['name'=>$signeedets->f_name.' '.$signeedets->l_name, 'email'=>$signeedets->email, 'id' =>$signature->id];
+            }
+        }
 
-        //returns an signing page
-        return view('signature.create', $data);
+        //returns an uploader page
+        return view('signatures.create', $data);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Process a request to sign a contract.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+
+    public function postSign(Request $request)
     {
         $contract = Contract::with('signatures')->find($request->contract_id);
         $user = Auth::user();
@@ -119,6 +134,81 @@ class SignatureController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //Validate that it's an email adress
+        $this->validate($request,array(
+            'contract_id' => 'required',
+            'email' => 'required|email'
+            ));
+
+        //set data to variables
+        $auth_user_id = Auth::user()->id;
+        $contract = Contract::with('signatures')->find($request->contract_id);
+        //Check whether this user has permission to edit this contract
+        if ($contract->creator_id != $auth_user_id){
+            abort(422);
+        }
+        //fetch contract key
+        UCrypt::setKey(Cache::get($auth_user_id));
+        $contract_key = UCrypt::decrypt($contract->key_enc);
+        $usr_email = $request->email;
+
+        //Check whether user with this email exists
+        if (is_null($signee = User::where('email',$usr_email)->first())) {
+            //register the user
+            $signee = User::create(array(
+                'email' => $usr_email,
+                'registered' =>false
+                ));
+        }
+        elseif($contract->signatures->where('signee_id', $signee->id)->first()){
+            return response()->json(['exists' => 2, 'email' => $usr_email]);
+        }
+        //check if this user is pending
+        if ($signee->registered==true) {
+            // load the signee pubkey, and encrypt
+            $pubkey = openssl_pkey_get_public(file_get_contents(storage_path('keys').'/'.$signee->pubkey.'.pem'));
+            openssl_public_encrypt($contract_key, $encryptedcc, $pubkey);
+            $encryptedcc = base64_encode($encryptedcc);
+
+            $response = ['exists' => 1, 'name' => $signee->f_name.' '.$signee->l_name, 'email' => $usr_email];
+        }
+        else{
+            $pendingsecret = str_random(32);
+            UCrypt::setKey($pendingsecret);
+            $encryptedcc = UCrypt::encrypt($contract_key);
+            //send email
+            Mail::send('emails.pendingsignatures', ['pending_secret' => $pendingsecret, 'user_id'=>$signee->id], function ($message) use ($usr_email) {
+            $message->from('admin@bitsign.it', 'BitSign.it');
+
+            $message->to($usr_email)->subject('You have been requested to sign a document');
+            });
+            //respond with JSON
+            $response = ['exists' => 0, 'email' => $usr_email, 'message'=>'An invitation to join Bitsign.it has been sent to '];
+        }
+        //add record to Signatures
+        $signeerecord = new Signature;
+        $signeerecord->contract_id = $contract->id;
+        $signeerecord->signee_id = $signee->id;
+        $signeerecord->contractkey_enc = $encryptedcc;
+        $signeerecord->status = false;
+        $signeerecord->term = 'default';
+        $signeerecord->save();
+        //reset contract
+        $contract->hash = '';
+        $contract->save();
+        //respond with JSON of user data
+        $response['id']=$signeerecord->id;
+        return response()->json($response);
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param  int  $id
@@ -126,7 +216,37 @@ class SignatureController extends Controller
      */
     public function show($id)
     {
-        //
+        // show the details of blockchain record etc
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //Check whether this contract belongs to this user
+        $signeerecord = Signature::with('contract', 'details')->find($id);
+
+        if ($signeerecord->contract->creator_id != Auth::user()->id){
+            $errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
+            return array(
+                'files' => $files,
+                'errors' => $errors
+            );
+        }
+        //if it's a pending user
+        $signee = $signeerecord->details;
+        if (!$signee->registered) {
+            if ($signee->signatures->count() <= 1) {
+                $signee->delete();
+            }
+        }
+
+        $signeerecord->delete();
+        return response()->json(array('deleted' => $id));
     }
 
     /**
@@ -158,7 +278,8 @@ class SignatureController extends Controller
         }
         //get signature
         $sigrecord = $contract->signatures->where('signee_id',$user->id)->first();
-        //load priate key to memory
+
+        //load private key to memory
         $privkeymem =  openssl_pkey_get_private(
                 file_get_contents(storage_path('keys/').$privname.'.pem'),
                 $privkeypass
@@ -193,8 +314,14 @@ class SignatureController extends Controller
             $sigfpath = storage_path('contracts/'.$contract->id.'/dsig_').$user->f_name.'_'.$user->l_name.'.xml';
             file_put_contents($sigfpath, XmlDSig::getSignedDocument());
             //hash that thang
-            $sha384 = hash('sha384', file_get_contents($sigfpath));
-            $sigrecord->hash = $sha384;
+            $sha256bin = hash('sha256', file_get_contents($sigfpath), true);
+            $sha256hex = bin2hex($sha256bin);
+            //store in BC
+            $blockcypher = new Blockcypher;
+            $txhash = $blockcypher->putData($sha256hex);
+            //store in DB
+            $sigrecord->hash = base64_encode($sha256bin);
+            $sigrecord->txhash = $txhash;
             $sigrecord->status = true;
             $sigrecord->save();
         }
