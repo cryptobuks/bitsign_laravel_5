@@ -8,7 +8,6 @@
         "php": ">=5.5.9",
         "laravel/framework": "5.1.*",
         "laravelcollective/html": "~5.0",
-        "styleci/git": "^3.0",
         "iwalpola/xmldigitalsignature": "1.*",
         "laravel/socialite": "~2.0"
     },
@@ -52,6 +51,7 @@
         ]
     },
     "config": {
-        "preferred-install": "dist"
+        "preferred-install": "dist",
+        "process-timeout": 0
     }
 }

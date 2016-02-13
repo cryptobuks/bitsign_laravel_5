@@ -12,8 +12,8 @@ class ContractTypesTableSeeder extends Seeder
     public function run()
     {
         $records = [
-        [1, 'default'],
-        [2, 'intellectual_property_record']
+        [1, 'Contract', 'Contract'],
+        [2, 'IP Record', 'Intellectual Property']
         ];
 
         foreach ($records as $record) {

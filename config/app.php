@@ -136,7 +136,6 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-        Iwalpola\XmlDigitalSignature\XmlDigitalSignatureServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -152,6 +151,7 @@ return [
          */
         'Collective\Html\HtmlServiceProvider',
         Laravel\Socialite\SocialiteServiceProvider::class,
+        Iwalpola\XmlDigitalSignature\XmlDigitalSignatureServiceProvider::class,
 
     ],
 

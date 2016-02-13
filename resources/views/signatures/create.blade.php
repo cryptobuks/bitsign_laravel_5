@@ -31,7 +31,7 @@
 			</div>
 			<div class="box-content">
 				<h4 class="page-header">Add people that need to sign this contract</h4>
-				<form class="form-horizontal" role="form" action="signeerecord" method="post" id="form-add-signees">
+				<form class="form-horizontal" role="form" action="addsignee" method="post" id="form-add-signees">
 					<div class="form-group">
 						<div class="col-sm-4">
 								<input type="text" placeholder="email address" class="form-control" name="signee_email" id="signee_email"/>
@@ -56,7 +56,7 @@
 					<tbody id="added-signees">
 					@if(isset($signeerecords))
 					@foreach($signeerecords as $signeerecord)
-						<tr class="signeerecord" id="{{$signeerecord['id']}}">
+						<tr class="signee" id="{{$signeerecord['id']}}">
 							<td>{{$signeerecord['name']}}</td>
 							<td>{{$signeerecord['email']}}</td>
 							<td><center><button id="{{$signeerecord['id']}}" class="delete-button btn-app-sm btn-circle btn-danger"><i class="fa fa-remove"></i></button></center></td>
@@ -97,7 +97,7 @@ $(function () {
             },
             function(data){
             	if(data['exists']==1) {
-            		$( '#added-signees' ).append("<tr class=\"signeerecord\" id=\""+String(data['id'])+"\"><td>"+String(data['name'])+"</td><td>"+String(data['email'])+"</td><td><center><button id=\""+String(data['id'])+"\" class=\"delete-button btn-app-sm btn-circle btn-danger\"><i class=\"fa fa-remove\"></i></button></center></td></tr>");
+            		$( '#added-signees' ).append("<tr class=\"signee\" id=\""+String(data['id'])+"\"><td>"+String(data['name'])+"</td><td>"+String(data['email'])+"</td><td><center><button id=\""+String(data['id'])+"\" class=\"delete-button btn-app-sm btn-circle btn-danger\"><i class=\"fa fa-remove\"></i></button></center></td></tr>");
 				}
 				else if(data['exists']==0) {
 					$('#messages').append("<p style=\"color:orange\">"+String(data['message']+data['email'])+'</p>');

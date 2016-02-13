@@ -12,8 +12,8 @@ class CreateFileRecordsTable extends Migration {
 	 */
 	public function up()
 	{
-		if (Schema::hasTable('filerecords')) {
-            Schema::drop('filerecords');
+		if (Schema::hasTable('file_records')) {
+            Schema::drop('file_records');
         }
 		Schema::create('file_records', function(Blueprint $table)
 		{

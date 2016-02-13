@@ -107,8 +107,8 @@
 						 <span class="hidden-xs">Intellectual Property</span>
 					</a>
 					<ul class="dropdown-menu">
+						<li><a class="ajax-link" href="ip/index">Manage IP</a></li>
 						<li><a class="ajax-link" href="ip/create">Create Record</a></li>
-						<li><a class="ajax-link" href="ip/share">Secure Share</a></li>
 						<li><a class="ajax-link" href="ip/sell">Sell for Bitcoin</a></li>
 					</ul>
 				</li>
@@ -129,9 +129,20 @@
 						<span class="hidden-xs">Contracts</span>
 					</a>
 					<ul class="dropdown-menu">
-						<li><a class="ajax-link" href="contracts">My Contracts</a></li>
-						<li><a class="ajax-link" href="contracts/create">New Contract</a></li>
-						<li><a class="ajax-link" href="contracts/import">Import a document</a></li>
+						<li><a class="ajax-link" href="contracts/index/1">My Contracts</a></li>
+						<li><a class="ajax-link" href="contracts/create/1">New Contract</a></li>
+					</ul>
+				</li>
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle">
+						<i class="fa fa-file-text-o"></i>
+						<span class="hidden-xs">Templates</span>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a class="ajax-link" href="templates">My Templates</a></li>
+						<li><a class="ajax-link" href="templates/create">Create/Branch</a></li>
+						<li><a class="ajax-link" href="templates">Collaborate</a></li>
+						<li><a class="ajax-link" href="templates">Dispatch</a></li>
 					</ul>
 				</li>
 				<li class="dropdown">

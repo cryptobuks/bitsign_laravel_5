@@ -45,7 +45,7 @@ class Contract extends Model
      * Get this contract's type.
      */
 
-    public function contracttype()
+    public function contractType()
     {
         return $this->belongsTo(ContractType::class);
     }

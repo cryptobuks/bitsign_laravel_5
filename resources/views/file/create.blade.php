@@ -93,7 +93,7 @@ $(function () {
         }
     });
     $("#btnNext").click(function(){
-    	var ajax_url = 'signeerecord/' + '{{$contract_id}}';
+    	var ajax_url = 'contract/' + '{{$contract_id}}' + '/signees';
     	window.location.hash = ajax_url;
 		LoadAjaxContent(ajax_url);
     });

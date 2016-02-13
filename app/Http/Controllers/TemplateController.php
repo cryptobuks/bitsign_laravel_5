@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Contract;
-use App\ContractType;
+use App\Template;
+use App\EditorPermision;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
 use Cache;
 use UCrypt;
 
-class ContractController extends Controller
+class TemplateController extends Controller
 {	
     /**
      * Create a new controller instance.
@@ -30,38 +30,21 @@ class ContractController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function index($type)
+	public function index()
 	{
-		$contracts = array();
+		$documents = array();
 		$auth_user_id = Auth::user()->id;
-		$secret = Cache::get($auth_user_id);
-        if ($type==1) {
-            $criteria = ['creator_id'=>$auth_user_id];
-        }
-        else{
-            $criteria = ['creator_id'=>$auth_user_id, 'contract_type_id' => $type];
-        }
-        $firstpass = true;
-		foreach (Contract::with('contractType')->where($criteria)->get() as $key => $contract) {
-            if ($firstpass) {
-                $data = array(
-                'subheading1'   => 'Dashboard',
-                'subheading2' => $contract->contractType->parent,
-                'subheading3' => 'Manage '.$contract->contractType->name.'s'
-                );
-                $firstpass = false;
-            }
-			UCrypt::setKey($secret);
-			UCrypt::setKey(Ucrypt::decrypt($contract->key_enc));
-			$data['contracts'][$key] = [
-			'id' => $contract->id,
-			'title'=> Ucrypt::decrypt($contract->title),
-			'type' => $contract->contractType->name,
-			'created_at' => $contract->created_at
-			];
+		foreach (EditorPermission::with('template')->where('editor_id',$auth_user_id)->get() as $editorpermission) {
+            $template = $editorpermission->template;
+			UCrypt::setKey($this->getSecret($editorpermission->dockey_enc, $auth_user_id));
+			$data['templates'][] = [
+			'id' => $template->id,
+			'title'=> Ucrypt::decrypt($template->title),
+			'editors' => $template->editor_count,
+			'created_at' => $template->created_at];
 		}
 		//returns the fetched contracts index
-		return view('contracts.index', $data);
+		return view('templates.index', $data);
 	}
 
 	/**
@@ -69,11 +52,10 @@ class ContractController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function create($type)
+	public function create()
 	{
-        $contract_type = ContractType::find($type);
 		//returns the TinyMCE Editor
-		return view('contracts.create')->withPosturl('contracts')->withType(['id'=>$type,'name' =>$contract_type->name,'parent' => $contract_type->parent ]);
+		return view('templates.create');
 	}
 
 	/**
@@ -86,13 +68,13 @@ class ContractController extends Controller
 	public function show($contract_id)
 	{
 		//get contract data
-        $contract_data = $this->getContractData($contract_id);
+        $contract_data = $this->getDocumentData($contract_id);
         //takes doc_id and appends to data array, then redirects to signature page
 
         $data = array(
         'contract_data'  => $contract_data,
-        'subheading1'   => 'Contracts',
-        'subheading2' => 'Sign Contract',
+        'subheading1'   => 'Documents',
+        'subheading2' => 'Sign Document',
         'subheading3' => 'Sign'
         );
 
@@ -117,7 +99,7 @@ class ContractController extends Controller
 		Ucrypt::setKey(Cache::get($contract->creator_id));
 		Ucrypt::setKey(Ucrypt::decrypt($contract->key_enc));
 		$data = array('title' => Ucrypt::decrypt($contract->title), 'content' => Ucrypt::decrypt($contract->content));
-		return view('contracts.create')->withData($data)->withPosturl('contracts/'.$id)->withType($contract->contract_type);
+		return view('contracts.create')->withData($data)->withPosturl('contracts/'.$id);
 	}
 
 	/**
@@ -149,12 +131,12 @@ class ContractController extends Controller
         $contract_title = UCrypt::encrypt($request->contract_title);
         $contract_content = UCrypt::encrypt($request->contract_content);
         // store in database
-        $contract = Contract::create([
+        $contract = Document::create([
         	'title' => $contract_title,
         	'content' => $contract_content
         	]);
         $contract->creator_id = $creator_id;
-        $contract->contract_type_id = $request->contract_type;
+        $contract->contracttype_id = $request->contract_type;
         $contract->key_enc = $contractkey_enc;
         $contract->save();
  
@@ -225,10 +207,10 @@ class ContractController extends Controller
      *
      * @return string $contract_data
      */
-    protected function getContractData($contract_id)
+    protected function getDocumentData($contract_id)
     {
         $auth_user_id = Auth::user()->id;
-        $contract = Contract::with('signatures.details.address','filerecords', 'contractType')->find($contract_id);
+        $contract = Document::with('signatures.details.address','filerecords', 'contracttype')->find($contract_id);
         //set filepath
         $filepath = storage_path('contracts/').$contract->id.'/contract.xml';
         //get the contract decryption key
@@ -254,7 +236,7 @@ class ContractController extends Controller
         $data['id'] = $contract->id;
         $data['title'] = UCrypt::decrypt($contract->title);
         $data['body'] = UCrypt::decrypt($contract->content);
-        $data['contract_type'] = str_replace(' ', '_', strtolower($contract->contractType->name));
+        $data['contracttype'] = $contract->contracttype->name;
         $data['key'] = $dcrypted_contractkey;
         //arrange the signing individuals into parties and fill in $data
         foreach ($contract->signatures as $signature) {
@@ -312,7 +294,7 @@ class ContractController extends Controller
     {
         //load xml from template
         $doc = new \DOMDocument;
-        $doc->load(base_path('resources/xmltemplates/').$data['contract_type'].'.xml');
+        $doc->load(base_path('resources/xmltemplates/').$data['contracttype'].'.xml');
         //set title
         $doc_title = $doc->getElementById('title');
         $doc_title->nodeValue = $data['title'];
@@ -373,5 +355,17 @@ class ContractController extends Controller
         file_put_contents($filepath, UCrypt::encrypt($unencryptedfile));
         //return the contract data
         return array($contracthash,$contractdate);
+    }
+
+    protected function getSecret($enc_key, $auth_user_id){
+        $pkeyname = Cache::get($auth_user_id.'priv').'.pem';
+        openssl_private_decrypt(
+            base64_decode($enc_key),
+            $key,
+            openssl_pkey_get_private(
+                file_get_contents(storage_path('keys').'/'.$pkeyname),
+                Cache::get($auth_user_id)
+            )
+        );
     }
 }

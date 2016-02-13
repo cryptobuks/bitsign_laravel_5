@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateContracttypesTable extends Migration
+class CreateTermsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,12 +12,15 @@ class CreateContracttypesTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('contract_types')) {
-            Schema::drop('contract_types');
+        if (Schema::hasTable('terms')) {
+            Schema::drop('terms');
         }
-        Schema::create('contract_types', function (Blueprint $table) {
+        Schema::create('terms', function(Blueprint $table)
+        {
             $table->increments('id');
-            $table->string('name',30);
+            $table->integer('document_id')->length(12)->unsigned()->index();
+            $table->string('term',15);
+            $table->string('type',15);
         });
     }
 
@@ -28,6 +31,6 @@ class CreateContracttypesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('contract_types');
+        Schema::drop('terms');
     }
 }

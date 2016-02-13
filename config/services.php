@@ -65,4 +65,8 @@ return [
         'redirect' => env('GITHUB_CALLBACK'),
     ],
 
+    'blockcypher' => [
+        'token'    => env('BLOCKCYPHER_TOKEN'),
+    ],
+
 ];

@@ -1,9 +1,9 @@
 <div class="row">
 	<div id="breadcrumb" class="col-md-12">
 		<ol class="breadcrumb">
-			<li><a href="dashboard">Dashboard</a></li>
-			<li><a href="#">Contracts</a></li>
-			<li><a href="#">My Contracts</a></li>
+			<li><a href="dashboard">{{$subheading1}}</a></li>
+			<li><a href="#">{{$subheading2}}</a></li>
+			<li><a href="#">{{$subheading3}}</a></li>
 		</ol>
 	</div>
 </div>
@@ -13,7 +13,7 @@
 			<div class="box-header">
 				<div class="box-name">
 					<i class="fa fa-file-text-o"></i>
-					<span>My Contracts</span>
+					<span>{{$subheading2}}</span>
 				</div>
 				<div class="box-icons">
 					<a class="collapse-link">
