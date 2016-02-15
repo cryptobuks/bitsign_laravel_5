@@ -127,7 +127,7 @@ class AuthController extends Controller
         if (is_null(Auth::user()->address)) {
             return view('auth.addaddress');
         }
-        return redirect('dashboard');
+        return redirect('/');
     }
 
     /**
@@ -158,7 +158,7 @@ class AuthController extends Controller
         $address->user_id = Auth::user()->id;
         $address->save();
 
-        return redirect('dashboard');
+        return redirect('/');
     }
 
     /**

@@ -12,7 +12,7 @@ class Contract extends Model
 	 * @var array
 	 */
 
-	protected $fillable = ['title','content','contracttype_id'];
+	protected $fillable = ['title','content','contract_type_id'];
 
 	/**
      * Get the user that created the contract.

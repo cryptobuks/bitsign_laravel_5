@@ -371,7 +371,7 @@ function RefreshActionButtons(){
 // Function for table, located in element with id = datatable-1
 //
 function ContractsTable(){
-	$('#datatable-1').dataTable( {
+	$('#contracts-table').dataTable( {
 		"aaSorting": [[ 0, "asc" ]],
 		"sDom": "<'box-content'<'col-sm-6'f><'col-sm-6 text-right'l><'clearfix'>>rt<'box-content'<'col-sm-6'i><'col-sm-6 text-right'p><'clearfix'>>",
 		"sPaginationType": "bootstrap",

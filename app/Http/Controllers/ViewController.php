@@ -16,7 +16,7 @@ class ViewController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['loadView']]);
+        $this->middleware('jwt.auth', ['except' => ['loadView']]);
     }
 
     /**
@@ -26,10 +26,7 @@ class ViewController extends Controller
      */
     public function loadView()
     {
-        if (Auth::user()) {
-            return view('layouts.dashboard');
-        }
-        return view('layouts.landing');
+        return view('layouts.dashboardhtml');
     }
 
     /**

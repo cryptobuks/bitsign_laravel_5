@@ -7,7 +7,7 @@ use App\Contract;
 use App\ContractType;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Auth;
+use JWTAuth;
 use Cache;
 use UCrypt;
 
@@ -21,7 +21,7 @@ class ContractController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('jwt.auth');
     }
 
     /**
@@ -32,8 +32,8 @@ class ContractController extends Controller
 	 */
 	public function index($type)
 	{
+        $auth_user_id = JWTAuth::parseToken()->authenticate()->id;
 		$contracts = array();
-		$auth_user_id = Auth::user()->id;
 		$secret = Cache::get($auth_user_id);
 
         if ($type==1) {
@@ -42,19 +42,11 @@ class ContractController extends Controller
         else{
             $criteria = ['creator_id'=>$auth_user_id, 'contract_type_id' => $type];
         }
-        $firstpass = true;
 		foreach (Contract::with('contractType')->where($criteria)->get() as $key => $contract) {
-            if ($firstpass) {
-                $data = array(
-                'subheading1'   => 'Dashboard',
-                'subheading2' => $contract->contractType->parent,
-                'subheading3' => 'Manage '.$contract->contractType->name.'s'
-                );
-                $firstpass = false;
-            }
 			UCrypt::setKey($secret);
 			UCrypt::setKey(Ucrypt::decrypt($contract->key_enc));
-			$data['contracts'][$key] = [
+			$contracts[] = [
+            'key' => $key,
 			'id' => $contract->id,
 			'title'=> Ucrypt::decrypt($contract->title),
 			'type' => $contract->contractType->name,
@@ -62,7 +54,7 @@ class ContractController extends Controller
 			];
 		}
 		//returns the fetched contracts index
-		return view('contracts.index', $data);
+		return response()->json($contracts);
 	}
 
 	/**
@@ -111,14 +103,14 @@ class ContractController extends Controller
 	public function edit($id)
 	{
 		//contract data
-		$contract = Auth::user()->contracts->find($id);
+		$contract = JWTAuth::parseToken()->authenticate()->contracts->find($id);
 		if (is_null($contract)){
 			abort(422);
 		}
 		Ucrypt::setKey(Cache::get($contract->creator_id));
 		Ucrypt::setKey(Ucrypt::decrypt($contract->key_enc));
-		$data = array('title' => Ucrypt::decrypt($contract->title), 'content' => Ucrypt::decrypt($contract->content));
-		return view('contracts.create')->withData($data)->withPosturl('contracts/'.$id)->withType($contract->contract_type);
+		$contractdata = array('id' => $contract->id, 'title' => Ucrypt::decrypt($contract->title), 'content' => Ucrypt::decrypt($contract->content), 'type' => $contract->contract_type);
+        return response()->json($contractdata);
 	}
 
 	/**
@@ -131,15 +123,16 @@ class ContractController extends Controller
 	
 	public function store(Request $request)
 	{
+        // set creator id
+        $creator_id = JWTAuth::parseToken()->authenticate()->id;
+        //validate
 		$this->validate($request, [
 			//if increasing the max size, also increase database
-        'contract_title' => 'required|max:40',
-        'contract_content' => 'required',
-        'contract_type' => 'exists:contract_types,id',
+        'title' => 'required|max:40',
+        'content' => 'required',
+        'type' => 'exists:contract_types,id',
     	]);
 
-		// set creator id
- 		$creator_id = Auth::user()->id;
         // generate this contract's key
         $contract_key = str_random(32);
         //encrypt contract key
@@ -147,20 +140,20 @@ class ContractController extends Controller
         $contractkey_enc = UCrypt::encrypt($contract_key);
         //encrypt contract title and content with contract key
         UCrypt::setKey($contract_key);
-        $contract_title = UCrypt::encrypt($request->contract_title);
-        $contract_content = UCrypt::encrypt($request->contract_content);
+        $contract_title = UCrypt::encrypt($request->title);
+        $contract_content = UCrypt::encrypt($request->content);
         // store in database
         $contract = Contract::create([
         	'title' => $contract_title,
         	'content' => $contract_content
         	]);
         $contract->creator_id = $creator_id;
-        $contract->contract_type_id = $request->contract_type;
+        $contract->contract_type_id = $request->type;
         $contract->key_enc = $contractkey_enc;
         $contract->save();
  
         $response = array(
-            'status' => 'success',
+            'success' => 'true',
             'contract_id' => $contract->id
         );
  
@@ -178,15 +171,14 @@ class ContractController extends Controller
     {
         $this->validate($request, [
 			//if increasing the max size, also increase database
-        'contract_title' => 'required|max:40',
-        'contract_content' => 'required',
-        'contract_type' => 'exists:contract_types,id',
+        'title' => 'required|max:40',
+        'content' => 'required'
     	]);
 
 		// get input
- 		$contract = Auth::user()->contracts->find($id);
-        $contract_title = $request->contract_title;
-        $contract_content = $request->contract_content;
+        $contract = JWTAuth::parseToken()->authenticate()->contracts->find($id);
+        $contract_title = $request->title;
+        $contract_content = $request->content;
         
         if (is_null($contract)) {
         	abort(422);
@@ -202,7 +194,7 @@ class ContractController extends Controller
         }
 
         $response = array(
-            'status' => 'success',
+            'success' => 'true',
             'contract_id' => $id
         );
  

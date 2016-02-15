@@ -97,7 +97,7 @@
     <!-- Side bar here -->
     <aside id="" class="sidebar">
         <div class="top-logo">
-            M
+            B
         </div>
         <div class="top-logo-extended">
             BitSign.it <br/> <span class="smaller">dashboard</span>

@@ -152,6 +152,7 @@ return [
         'Collective\Html\HtmlServiceProvider',
         Laravel\Socialite\SocialiteServiceProvider::class,
         Iwalpola\XmlDigitalSignature\XmlDigitalSignatureServiceProvider::class,
+        'Tymon\JWTAuth\Providers\JWTAuthServiceProvider',
 
     ],
 
@@ -206,6 +207,8 @@ return [
         'XmlDSig'   => Iwalpola\XmlDigitalSignature\XmlDigitalSignatureFacade::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'UCrypt'    => App\Packages\UserEncrypterFacade::class,
+        'JWTAuth'   => Tymon\JWTAuth\Facades\JWTAuth::class,
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
     ],
 
 ];

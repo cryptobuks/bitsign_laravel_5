@@ -20,6 +20,7 @@ class ContractTypesTableSeeder extends Seeder
             DB::table('contract_types')->insert([
             'id' => $record[0],
             'name' => $record[1],
+            'parent' =>$record[2]
             ]);
         }
         

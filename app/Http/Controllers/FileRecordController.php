@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\FileRecord;
 use App\Contract;
 use Validator;
-use Auth;
+use JWTAuth;
 use Cache;
 use UCrypt;
 use App\Http\Requests;
@@ -22,7 +22,7 @@ class FileRecordController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('jwt.auth');
     }
 
     /**
@@ -30,38 +30,30 @@ class FileRecordController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function create($contract_id)
+	public function index($contract_id)
 	{
-		$auth_user_id = Auth::user()->id;
+		$auth_user_id = JWTAuth::parseToken()->authenticate()->id;
 		$contract = Contract::with('contractType', 'filerecords')->find($contract_id);
 		if ($contract->creator_id != $auth_user_id) {
 			abort(422);
 		}
 		$filerecords = $contract->filerecords;
-		$contracttype = $contract->contractType;
-		//takes doc_id and appends to data array, then redirects to file import page
-		$data = array(
-    	'contract_id'  => $contract_id,
-    	'subheading1'   => $contracttype->parent,
-    	'subheading2' => 'Create '.$contracttype->name,
-    	'subheading3' => 'Attach Files'
-		);
-
+		$files = [];
 		if (!is_null($filerecords)) {
 			foreach ($filerecords as $filerecord) {
-				$data['filerecords'][] = ['filename'=>$filerecord->filename, 'hash'=>$filerecord->hash, 'id'=>$filerecord->id];
+				$files[] = ['name'=>$filerecord->filename, 'hash'=>$filerecord->hash, 'id'=>$filerecord->id];
 			}
 		}
 		
-		//returns an uploader page
-		return view('file.create', $data);
+		//returns JSON
+		return response()->json($files);
 	}
 
 
-	public function store(Request $request)
+	public function store(Request $request, $contract_id)
 	{
-		$auth_user_id = Auth::user()->id;
-		$contract = Contract::with('filerecords')->find($request->contract_id);
+		$auth_user_id = JWTAuth::parseToken()->authenticate()->id;
+		$contract = Contract::with('filerecords')->find($contract_id);
 
 		//abort if not owner
 		if ($contract->creator_id != $auth_user_id) {
@@ -84,7 +76,7 @@ class FileRecordController extends Controller
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 
 		//Get files from POST Input, and cast single file to array
-		$all_uploads = $request->file('files'); // your file upload input field in the form should be named 'files' or 'files[]'
+		$all_uploads = $request->file('file'); // your file upload input field in the form should be named 'files' or 'files[]'
 	    if (!is_array($all_uploads)) {
 	        $all_uploads = array($all_uploads);
 	    }
@@ -136,7 +128,7 @@ class FileRecordController extends Controller
 					    $contract->save();
 					    //add to response
 				        $files[] = array(
-				        	'filename' => $upload->getClientOriginalName(),
+				        	'name' => $upload->getClientOriginalName(),
 				        	'hash' => $shafile,
 				        	'id' => $filerecord->getKey()
 				        	);
@@ -145,16 +137,16 @@ class FileRecordController extends Controller
 	        } 
 	        else {
 	            // Collect error messages
-	            $errors[] = 'File ' . $filename . ':' . $validator->messages()->first('file');
+	            $files[] = array(
+				        	'name' => $upload->getClientOriginalName(),
+				        	'error' => 'File ' . $filename . ':' . $validator->messages()->first('file')
+				        	);
 	        }
 
 	    }
 
 	    // return our results in a files object
-	    return array(
-	        'files' => $files,
-	        'errors' => $errors
-	    );
+	    return $files;
 	
 	}
 
@@ -170,18 +162,14 @@ class FileRecordController extends Controller
 		//Check whether this contract belongs to this user
 		$filerecord = FileRecord::with('contract')->find($id);
 
-		if ($filerecord->contract->creator_id != Auth::user()->id){
-			$errors[] = 'You are not the creator. Get out now to avoid a lawsuit';
-			return array(
-				'files' => $files,
-	        	'errors' => $errors
-	    	);
+		if ($filerecord->contract->creator_id != JWTAuth::parseToken()->authenticate()->id){
+			abort(405);
 		}
 		//delete from filesystem
 		$filepath = storage_path('contracts/'.$filerecord->contract->id.'/files/').$filerecord->filename;
 		unlink($filepath);
 
 		$filerecord->delete();
-		return response()->json(array('deleted' => $id));
+		return response()->json(array('success' => true));
 	}
 }

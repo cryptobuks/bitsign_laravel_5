@@ -54,10 +54,8 @@ array('only' => array('index','create' ,'edit', 'store', 'show')));
 
 /*Routing for File Controller*/
 
-Route::resource('file', 'FileRecordController', 
-	array('only' => array('store')));
-
-Route::get('file/{id}', ['uses' => 'FileRecordController@create']);
+Route::get('file/{contract_id}/index', ['uses' => 'FileRecordController@index']);
+Route::post('file/{contract_id}/store', ['uses' => 'FileRecordController@store']);
 Route::get('file/{id}/delete', ['uses' => 'FileRecordController@destroy']);
 
 /*Routing for Signature Records*/
@@ -70,6 +68,11 @@ Route::get('signee/{id}/delete', ['uses' => 'SignatureController@destroy']);
 Route::post('sign', 'SignatureController@postSign');
 Route::get('signatures/{status}', 'SignatureController@index');
 
+/*Routing for Angular JWT Auth*/
+Route::post('api/register', 'TokenAuthController@register');
+Route::post('api/authenticate', 'TokenAuthController@authenticate');
+Route::get('api/authenticate/user', 'TokenAuthController@getAuthenticatedUser');
+
 /*
 |--------------------------------------------------------------------------
 | Material Dash Routes
@@ -81,9 +84,9 @@ Route::get('signatures/{status}', 'SignatureController@index');
 |
 */
 
-// Route::get('/home', function () {
-//     return view('home');
-// });
+Route::get('/biff', function () {
+    return view('home');
+});
 
 Route::get('/login', function () {
     return view('pages.login');
