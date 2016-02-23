@@ -60,8 +60,8 @@ Route::get('file/{id}/delete', ['uses' => 'FileRecordController@destroy']);
 
 /*Routing for Signature Records*/
 
-Route::get('contract/{id}/signees', ['uses' => 'SignatureController@create']);
-Route::post('addsignee', ['uses' => 'SignatureController@store']);
+Route::get('contract/{id}/signees', ['uses' => 'ContractController@signees']);
+Route::post('signee/{contract_id}/store', ['uses' => 'SignatureController@store']);
 Route::get('signee/{id}/delete', ['uses' => 'SignatureController@destroy']);
 
 /*Routing for Signature Controller*/
@@ -72,3 +72,4 @@ Route::get('signatures/{status}', 'SignatureController@index');
 Route::post('api/register', 'TokenAuthController@register');
 Route::post('api/authenticate', 'TokenAuthController@authenticate');
 Route::get('api/authenticate/user', 'TokenAuthController@getAuthenticatedUser');
+Route::get('api/authenticate/unlink', 'TokenAuthController@unlink');

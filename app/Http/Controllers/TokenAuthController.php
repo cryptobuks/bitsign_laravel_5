@@ -54,39 +54,12 @@ class TokenAuthController extends Controller
             return response()->json(['token_absent'], $e->getStatusCode());
  
         }
-        //set the user gey in cache
+        //set the user key in cache
         $crypt = Cache::get(JWTAuth::getToken());
         Cache::forget(JWTAuth::getToken());
         $this->cacheKey($crypt, $user);
  
         return response()->json(compact('user'));
-    }
- 
-    public function register(Request $request){
- 
-        $newuser= $request->all();
-        $password=bcrypt($request->input('password'));
- 
-        $newuser['password'] = $password;
- 
-        return User::create($newuser);
-    }
-
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'email' => 'required|email|max:255|unique:users',
-            'f_name' => 'required|alpha|max:50',
-            'l_name' => 'required|alpha|max:50',
-            'password' => 'required|confirmed|min:6',
-            'terms' => 'accepted',
-        ]);
     }
 
     /**
@@ -106,6 +79,59 @@ class TokenAuthController extends Controller
         Cache::forever($user->id, $unencryptedkey);
         Cache::forever($user->id.'priv', $privkeyname);
         return;
+    }
+ 
+    public function register(Request $request){
+ 
+        $this->validate($request, [
+            'email' => 'required|email|max:255|unique:users',
+            'f_name' => 'required|alpha|max:50',
+            'l_name' => 'required|alpha|max:50',
+            'password' => 'required|confirmed|min:6',
+            'terms' => 'accepted',
+        ]);
+
+        $newuser = $request->only('email', 'f_name', 'l_name', 'password');
+ 
+        return response()->json(compact($this->create($newuser)));
+    }
+
+    protected function create(array $newuser)
+    {
+        //Create the User
+        $user = User::create([
+            'f_name' => $newuser['f_name'],
+            'l_name' => $newuser['l_name'],
+            'email' => $newuser['email'],
+            'password' => bcrypt($newuser['password'])
+            ]);
+        //create and store user key to variable
+        $user_key = str_random(32);
+        //encrypt user_key with server pubkey and store
+        $serverpubkey = openssl_pkey_get_public(file_get_contents(base_path('resources/keys').'/serverpublic.pem'));
+        openssl_public_encrypt($user_key, $encrypted, $serverpubkey);
+        $rsaenckeyfile = fopen(base_path('resources/keys').'/userkeys.txt', 'a');
+        fwrite($rsaenckeyfile, $user->id.','.base64_encode($encrypted)."\n");
+        fclose($rsaenckeyfile);
+        //encrypt the user_key with the crypt key
+        UCrypt::setKey($this->generateCrypt($newuser['password']));
+        $user_key_enc = UCrypt::encrypt($user_key);
+        //generate the signing keypair
+        $filenames = $this->generateKeypair($user_key);
+        UCrypt::setKey($user_key);
+        $signkeyname_enc = UCrypt::encrypt($filenames['privkey']);
+        $pubkeyname = $filenames['pubkey'];
+        //Cache
+        Cache::forever($user->id, $user_key);
+        Cache::forever($user->id.'priv', $filenames['privkey']);
+        //save rest of data to table
+        $user->registered = true;
+        $user->key_enc = $user_key_enc;
+        $user->signkeyname_enc = $signkeyname_enc;
+        $user->pubkey = $pubkeyname;
+        $user->save();
+        
+        return $user;
     }
 
     /**
@@ -155,5 +181,17 @@ class TokenAuthController extends Controller
         $xmlString = $xml->asXML();
         $xmlString = str_replace("<?xml version=\"1.0\"?>\n", '', $xmlString);
         file_put_contents(storage_path('keys/').$filename.'.xml', $xmlString);
+    }
+
+    public function unlink(){
+
+        if (! $user = JWTAuth::parseToken()->authenticate()) {
+            return response()->json(['user_not_found'], 404);
+        }
+ 
+        Cache::forget($user->id);
+        Cache::forget($user->id.'priv');
+ 
+        return response()->json(['success' => true]);
     }
 }

@@ -153,6 +153,7 @@ return [
         Laravel\Socialite\SocialiteServiceProvider::class,
         Iwalpola\XmlDigitalSignature\XmlDigitalSignatureServiceProvider::class,
         'Tymon\JWTAuth\Providers\JWTAuthServiceProvider',
+        'Barryvdh\Cors\ServiceProvider'
 
     ],
 

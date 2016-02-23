@@ -213,6 +213,26 @@ class ContractController extends Controller
 		//
 	}
 
+    /**
+     * Index the signees of this contract.
+     * GET /contract/{id}/signees
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function signees($contract_id)
+    {
+        $auth_user_id = JWTAuth::parseToken()->authenticate()->id;
+        $contract = Contract::with('signatures.details')->find($contract_id);
+        $signees =[];
+        foreach ($contract->signatures as $signature) {
+            $signee = $signature->details;
+            $signees[] = ['name' => $signee->f_name.' '.$signee->l_name, 'email' => $signee->email,'id' =>$signature->id];
+        }
+
+        return response()->json($signees);
+    }
+
 	/**
      * Fetch contract data from database.
      *
