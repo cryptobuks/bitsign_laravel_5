@@ -43,9 +43,8 @@ Route::get('ip/index', function () {
 /*Routing for Contracts Controller*/
 
 Route::resource('contracts', 'ContractController', 
-array('only' => array('edit', 'store', 'show')));
+array('only' => array('index', 'edit', 'store', 'show')));
 Route::get('contracts/create/{type?}', ['as' => 'contracts.create', 'uses' => 'ContractController@create']);
-Route::get('contracts/index/{type?}', ['as' => 'contracts.index', 'uses' => 'ContractController@index']);
 Route::post('contracts/{id}', ['uses' => 'ContractController@update']);
 
 /*Routing for templates*/

@@ -12,7 +12,7 @@ class Contract extends Model
 	 * @var array
 	 */
 
-	protected $fillable = ['title','content','contract_type_id'];
+	protected $fillable = [];
 
 	/**
      * Get the user that created the contract.
@@ -21,6 +21,15 @@ class Contract extends Model
 	public function creator()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get this document's editors
+     */
+
+    public function editors()
+    {
+        return $this->hasMany(EditorPermission::class);
     }
 
     /**

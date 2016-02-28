@@ -12,16 +12,16 @@ class EditorPermission extends Model
      * Get the document that this editing record belongs to.
      */
 
-    public function template()
+    public function contract()
     {
-        return $this->belongsTo(Template::class);
+        return $this->belongsTo(Contract::class);
     }
 
     /**
      * Get the user that created this signature.
      */
 
-	public function editor()
+	public function details()
     {
         return $this->belongsTo(User::class);
     }
