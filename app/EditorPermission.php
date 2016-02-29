@@ -23,7 +23,7 @@ class EditorPermission extends Model
 
 	public function details()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'editor_id');
     }
 
 }

@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->string('key_enc', 244);
             $table->string('signkeyname_enc', 244);
             $table->string('pubkey', 32);
+            $table->string('dropbox_token', 60);
             $table->boolean('registered');
             $table->rememberToken();
             $table->timestamps();

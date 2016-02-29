@@ -18,18 +18,18 @@ Route::get('/', 'ViewController@loadView');
 Route::get('home', 'ViewController@home');
 
 // Authentication Routes...
-Route::get('auth/login/{provider?}', 'Auth\AuthController@getLogin');
-Route::post('auth/login', 'Auth\AuthController@postLogin');
-Route::get('auth/logout', 'Auth\AuthController@getLogout');
-Route::get('auth/callback/{provider}', 'Auth\AuthController@handleProviderCallback');
+// Route::get('auth/login/{provider?}', 'Auth\AuthController@getLogin');
+// Route::post('auth/login', 'Auth\AuthController@postLogin');
+// Route::get('auth/logout', 'Auth\AuthController@getLogout');
+// Route::get('auth/callback/{provider}', 'Auth\AuthController@handleProviderCallback');
 
-// Registration Routes...
-Route::get('auth/register', 'Auth\AuthController@getRegister');
-Route::post('auth/register', 'Auth\AuthController@postRegister');
+// // Registration Routes...
+// Route::get('auth/register', 'Auth\AuthController@getRegister');
+// Route::post('auth/register', 'Auth\AuthController@postRegister');
 
-//Add Address
-Route::get('addaddress', 'Auth\AuthController@getAddAddress');
-Route::post('addaddress', 'Auth\AuthController@postAddAddress');
+// //Add Address
+// Route::get('addaddress', 'Auth\AuthController@getAddAddress');
+// Route::post('addaddress', 'Auth\AuthController@postAddAddress');
 
 /*Routing for Intellectual Property*/
 
@@ -50,6 +50,12 @@ Route::post('contracts/{id}', ['uses' => 'ContractController@update']);
 /*Routing for templates*/
 Route::resource('templates', 'TemplateController', 
 array('only' => array('index','create' ,'edit', 'store', 'show')));
+
+/*Routing for Editor Controller*/
+
+Route::get('editors/{contract_id}/index', ['uses' => 'EditorController@index']);
+Route::post('editors/{contract_id}/add', ['uses' => 'EditorController@store']);
+Route::delete('editors/{id}', ['uses' => 'EditorController@destroy']);
 
 /*Routing for File Controller*/
 
@@ -72,3 +78,6 @@ Route::post('api/register', 'TokenAuthController@register');
 Route::post('api/authenticate', 'TokenAuthController@authenticate');
 Route::get('api/authenticate/user', 'TokenAuthController@getAuthenticatedUser');
 Route::get('api/authenticate/unlink', 'TokenAuthController@unlink');
+
+/*Routing for dropbox callback with access token*/
+Route::post('callback/dropbox', 'DropboxController@persistToken');

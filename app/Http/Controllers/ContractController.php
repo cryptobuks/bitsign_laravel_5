@@ -130,7 +130,7 @@ class ContractController extends Controller
         //validate
 
         //if contract exists
-        if (!isset($request->id)) {
+        if (!isset($request->id) || $request->id=='new') {
             // generate this contract's key
             $contract_key = str_random(32);
             //encrypt contract key
