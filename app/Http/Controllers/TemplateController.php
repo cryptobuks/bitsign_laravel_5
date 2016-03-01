@@ -45,7 +45,7 @@ class TemplateController extends Controller
 			'created_at' => $template->created_at
 			];
 		}
-        $editorpermissions = EditorPermission::with('template.creator')->where(['editor_id' => $auth_user_id, 'accepted' => true]);
+        $editorpermissions = EditorPermission::with('template.creator')->where(['editor_id' => $auth_user_id, 'accepted' => true])->get();
         foreach ( $editorpermissions as $ep) {
             $template = $ep->template;
             $creator = $template->creator;
@@ -71,12 +71,31 @@ class TemplateController extends Controller
 	public function edit($id)
 	{
 		//template data
-		$templateraw = JWTAuth::parseToken()->authenticate()->templates->find($id);
+        $auth_user = JWTAuth::parseToken()->authenticate();
+        $auth_user_id = $auth_user->id;
+		$templateraw = $auth_user->templates->find($id);
 		if (is_null($templateraw)){
-			abort(422);
+            $permission = EditorPermission::with('template')->where(['editor_id' => $auth_user->id, 'template_id'=>$id])->first();
+            if (is_null($permission)) {
+                abort(422);
+            }
+            $templateraw = $permission->template;
+            $pkeyname = Cache::get($auth_user_id.'priv').'.pem';
+            $pubenc_contractkey = $permission->key_enc;
+            openssl_private_decrypt(
+                base64_decode($pubenc_contractkey),
+                $dcrypted_contractkey,
+                openssl_pkey_get_private(
+                    file_get_contents(storage_path('keys').'/'.$pkeyname),
+                    Cache::get($auth_user_id)
+                )
+            );
+            UCrypt::setKey($dcrypted_contractkey);
 		}
-		Ucrypt::setKey(Cache::get($templateraw->creator_id));
-		Ucrypt::setKey(Ucrypt::decrypt($templateraw->key_enc));
+        else{
+            Ucrypt::setKey(Cache::get($templateraw->creator_id));
+            Ucrypt::setKey(Ucrypt::decrypt($templateraw->key_enc));
+        }
 
 		$template = [
         'id' => $templateraw->id,
@@ -100,16 +119,18 @@ class TemplateController extends Controller
 	public function store(Request $request)
 	{
         // set creator id
-        $creator_id = JWTAuth::parseToken()->authenticate()->id;
+        $auth_user = JWTAuth::parseToken()->authenticate();
+        $auth_user_id = $auth_user->id;
+        $template_id = $request->id;
 
         //validate
 
-        //if template exists
-        if (!isset($request->id) || $request->id=='new') {
+        //if template is new
+        if (!isset($template_id) || $template_id=='new') {
             // generate this template's key
             $template_key = str_random(32);
             //encrypt template key
-            UCrypt::setKey(Cache::get($creator_id));
+            UCrypt::setKey(Cache::get($auth_user_id));
             $templatekey_enc = UCrypt::encrypt($template_key);
             //encrypt template title and content with template key
             UCrypt::setKey($template_key);
@@ -119,10 +140,29 @@ class TemplateController extends Controller
         }
 
         else {
-            $template = JWTAuth::parseToken()->authenticate()->templates->find($request->id);
-            //save the encrypted stuff
-            UCrypt::setKey(Cache::get($template->creator_id));
-            UCrypt::setKey(UCrypt::decrypt($template->key_enc));
+            if (is_null($template = $auth_user->templates->find($template_id))){
+                $permission = EditorPermission::with('template')->where(['editor_id' => $auth_user->id, 'template_id'=>$template_id])->first();
+                if (is_null($permission)) {
+                    abort(422);
+                }
+                $editing = true;
+                $template = $permission->template;
+                $pkeyname = Cache::get($auth_user_id.'priv').'.pem';
+                $pubenc_contractkey = $permission->key_enc;
+                openssl_private_decrypt(
+                    base64_decode($pubenc_contractkey),
+                    $dcrypted_contractkey,
+                    openssl_pkey_get_private(
+                        file_get_contents(storage_path('keys').'/'.$pkeyname),
+                        Cache::get($auth_user_id)
+                    )
+                );
+                UCrypt::setKey($dcrypted_contractkey);
+            }
+            else{
+                Ucrypt::setKey(Cache::get($template->creator_id));
+                Ucrypt::setKey(Ucrypt::decrypt($template->key_enc));
+            }
         }
 
         // store in database
@@ -131,7 +171,9 @@ class TemplateController extends Controller
         $template->terms = UCrypt::encrypt($request->terms);
         $template->parties = UCrypt::encrypt($request->parties);
         $template->attachments = UCrypt::encrypt($request->attachments);
-        $template->creator_id = $creator_id;
+        if (!isset($editing)) {
+            $template->creator_id = $auth_user_id;
+        }
         $template->save();
  
         $response = array(
