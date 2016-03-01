@@ -47,6 +47,11 @@ array('only' => array('index', 'edit', 'store', 'show')));
 Route::get('contracts/create/{type?}', ['as' => 'contracts.create', 'uses' => 'ContractController@create']);
 Route::post('contracts/{id}', ['uses' => 'ContractController@update']);
 
+/*Routing for Templates Controller*/
+
+Route::resource('templates', 'TemplateController', 
+array('only' => array('index', 'edit', 'store')));
+
 /*Routing for templates*/
 Route::resource('templates', 'TemplateController', 
 array('only' => array('index','create' ,'edit', 'store', 'show')));

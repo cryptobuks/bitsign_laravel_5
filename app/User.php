@@ -46,6 +46,14 @@ class User extends Model implements AuthenticatableContract,
     }
 
     /**
+     * Get all of the templates created by the user.
+     */
+    public function templates()
+    {
+        return $this->hasMany(Template::class, 'creator_id');
+    }
+
+    /**
      * Get all of the signatures created by the user.
      */
     public function signatures()

@@ -19,8 +19,8 @@ class CreateEditorPermissionsTable extends Migration
         {
             $table->increments('id');
             $table->integer('editor_id')->length(12)->unsigned()->index();
-            $table->integer('contract_id')->length(12)->unsigned()->index();
-            $table->string('contractkey_enc', 684);
+            $table->integer('template_id')->length(12)->unsigned()->index();
+            $table->string('key_enc', 684);
             $table->boolean('accepted');
             $table->timestamps();
         });

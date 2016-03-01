@@ -18,6 +18,15 @@ class EditorPermission extends Model
     }
 
     /**
+     * Get the document that this editing record belongs to.
+     */
+
+    public function template()
+    {
+        return $this->belongsTo(Template::class);
+    }
+
+    /**
      * Get the user that created this signature.
      */
 
