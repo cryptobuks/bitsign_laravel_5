@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Contract;
+use App\EditorPermission;
 use App\ContractType;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -41,49 +42,23 @@ class ContractController extends Controller
 			UCrypt::setKey(Ucrypt::decrypt($contract->key_enc));
 			$contracts[] = [
 			'id' => $contract->id,
-			'title'=> Ucrypt::decrypt($contract->title),
+			'title'=> $contract->title,
 			'type' => 'default',
 			'created_at' => $contract->created_at
 			];
 		}
+        $editorpermissions = EditorPermission::with('contract')->where(['editor_id' => $auth_user_id, 'accepted' => true]);
+        foreach ( $editorpermissions as $ep) {
+            $contract = $ep->contract;
+            $contracts[] = [
+            'id' => $contract->id,
+            'title'=> $contract->title,
+            'type' => 'default',
+            'created_at' => $contract->created_at
+            ]; 
+        }
 		//returns the fetched contracts index
 		return response()->json($contracts);
-	}
-
-	/**
-	 * Show the form for creating a new contract.
-	 *
-	 * @return Response
-	 */
-	public function create($type)
-	{
-        $contract_type = ContractType::find($type);
-		//returns the TinyMCE Editor
-		return view('contracts.create')->withPosturl('contracts')->withType(['id'=>$type,'name' =>$contract_type->name,'parent' => $contract_type->parent ]);
-	}
-
-	/**
-	 * Display the specified resource.
-	 * GET /contracts/{id}
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($contract_id)
-	{
-		//get contract data
-        $contract_data = $this->getContractData($contract_id);
-        //takes doc_id and appends to data array, then redirects to signature page
-
-        $data = array(
-        'contract_data'  => $contract_data,
-        'subheading1'   => 'Contracts',
-        'subheading2' => 'Sign Contract',
-        'subheading3' => 'Sign'
-        );
-
-        //returns an signing page
-        return view('contracts.show', $data);
 	}
 
 	/**
@@ -105,7 +80,7 @@ class ContractController extends Controller
 
 		$contract = [
         'id' => $contractraw->id,
-        'title' => UCrypt::decrypt($contractraw->title),
+        'title' => $contractraw->title,
         'clauses' => UCrypt::decrypt($contractraw->clauses),
         'terms' => UCrypt::decrypt($contractraw->terms),
         'parties' => UCrypt::decrypt($contractraw->parties),
@@ -150,7 +125,7 @@ class ContractController extends Controller
         }
 
         // store in database
-        $contract->title = UCrypt::encrypt($request->title);
+        $contract->title = $request->title;
         $contract->clauses = UCrypt::encrypt($request->clauses);
         $contract->terms = UCrypt::encrypt($request->terms);
         $contract->parties = UCrypt::encrypt($request->parties);
@@ -192,8 +167,8 @@ class ContractController extends Controller
         //save the encrypted stuff
         UCrypt::setKey(Cache::get($contract->creator_id));
         UCrypt::setKey(UCrypt::decrypt($contract->key_enc));
-        if (UCrypt::decrypt($contract->title) != $contract_title || UCrypt::decrypt($contract->content) != $contract_content) {
-        	$contract->title = UCrypt::encrypt($contract_title);
+        if ($contract->title != $contract_title || UCrypt::decrypt($contract->content) != $contract_content) {
+        	$contract->title = $contract_title;
 	        $contract->content = UCrypt::encrypt($contract_content);
 	        $contract->hash = '';
 	        $contract->save();
@@ -271,7 +246,7 @@ class ContractController extends Controller
         UCrypt::setKey($dcrypted_contractkey);
         //get data and fill in array
         $data['id'] = $contract->id;
-        $data['title'] = UCrypt::decrypt($contract->title);
+        $data['title'] = $contract->title;
         $data['body'] = UCrypt::decrypt($contract->content);
         $data['contract_type'] = str_replace(' ', '_', strtolower($contract->contractType->name));
         $data['key'] = $dcrypted_contractkey;
