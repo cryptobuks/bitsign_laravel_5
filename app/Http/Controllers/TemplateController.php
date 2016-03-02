@@ -8,11 +8,12 @@ use App\EditorPermission;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use JWTAuth;
-use Cache;
 use UCrypt;
+use App\Packages\KeyMaker;
 
 class TemplateController extends Controller
 {	
+    protected $keymaker;
     /**
      * Create a new controller instance.
      *
@@ -22,6 +23,7 @@ class TemplateController extends Controller
     public function __construct()
     {
         $this->middleware('jwt.auth');
+        $this->keymaker = new KeyMaker;
     }
 
     /**
@@ -73,30 +75,21 @@ class TemplateController extends Controller
 		//template data
         $auth_user = JWTAuth::parseToken()->authenticate();
         $auth_user_id = $auth_user->id;
-		$templateraw = $auth_user->templates->find($id);
-		if (is_null($templateraw)){
+		if (is_null($templateraw = $auth_user->templates->find($id))){
             $permission = EditorPermission::with('template')->where(['editor_id' => $auth_user->id, 'template_id'=>$id])->first();
             if (is_null($permission)) {
                 abort(422);
             }
             $templateraw = $permission->template;
-            $pkeyname = Cache::get($auth_user_id.'priv').'.pem';
-            $pubenc_contractkey = $permission->key_enc;
-            openssl_private_decrypt(
-                base64_decode($pubenc_contractkey),
-                $dcrypted_contractkey,
-                openssl_pkey_get_private(
-                    file_get_contents(storage_path('keys').'/'.$pkeyname),
-                    Cache::get($auth_user_id)
-                )
-            );
-            UCrypt::setKey($dcrypted_contractkey);
+            $shared = true;
+            $key_enc = $permission->key_enc;
 		}
         else{
-            Ucrypt::setKey(Cache::get($templateraw->creator_id));
-            Ucrypt::setKey(Ucrypt::decrypt($templateraw->key_enc));
+            $shared = false;
+            $key_enc = $templateraw->key_enc;
         }
-
+        $template_key = $this->keymaker->getTemplateKey($auth_user_id, $key_enc, $shared);
+        UCrypt::setKey($template_key);
 		$template = [
         'id' => $templateraw->id,
         'title' => $templateraw->title,
@@ -126,17 +119,19 @@ class TemplateController extends Controller
         //validate
 
         //if template is new
-        if (!isset($template_id) || $template_id=='new') {
+        if ($template_id=='new') {
             // generate this template's key
             $template_key = str_random(32);
+            //set creator key
+            $creator_key = $this->keymaker->getUserKey($auth_user_id);
             //encrypt template key
-            UCrypt::setKey(Cache::get($auth_user_id));
+            UCrypt::setKey($creator_key);
             $templatekey_enc = UCrypt::encrypt($template_key);
             //encrypt template title and content with template key
-            UCrypt::setKey($template_key);
             $template = new Template;
             $template->key_enc = $templatekey_enc;
             $template->editor_count = 0;
+            $template->creator_id = $auth_user_id;
         }
 
         else {
@@ -145,35 +140,23 @@ class TemplateController extends Controller
                 if (is_null($permission)) {
                     abort(422);
                 }
-                $editing = true;
                 $template = $permission->template;
-                $pkeyname = Cache::get($auth_user_id.'priv').'.pem';
-                $pubenc_contractkey = $permission->key_enc;
-                openssl_private_decrypt(
-                    base64_decode($pubenc_contractkey),
-                    $dcrypted_contractkey,
-                    openssl_pkey_get_private(
-                        file_get_contents(storage_path('keys').'/'.$pkeyname),
-                        Cache::get($auth_user_id)
-                    )
-                );
-                UCrypt::setKey($dcrypted_contractkey);
+                $key_enc = $permission->key_enc;
+                $shared = true;
             }
             else{
-                Ucrypt::setKey(Cache::get($template->creator_id));
-                Ucrypt::setKey(Ucrypt::decrypt($template->key_enc));
+                $key_enc = $template->key_enc;
+                $shared = false;
             }
+            $template_key = $this->keymaker->getTemplateKey($auth_user_id, $key_enc, $shared);
         }
-
+        UCrypt::setKey($template_key);
         // store in database
         $template->title = $request->title;
         $template->clauses = UCrypt::encrypt($request->clauses);
         $template->terms = UCrypt::encrypt($request->terms);
         $template->parties = UCrypt::encrypt($request->parties);
         $template->attachments = UCrypt::encrypt($request->attachments);
-        if (!isset($editing)) {
-            $template->creator_id = $auth_user_id;
-        }
         $template->save();
  
         $response = array(

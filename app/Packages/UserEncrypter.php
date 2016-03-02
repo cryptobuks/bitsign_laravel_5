@@ -12,7 +12,7 @@ class UserEncrypter extends Encrypter {
      * @param  string  $key
      * @return void
      */
-    public function setKey( $key ) {
+    public function setKey($key) {
         $this->key = (string) $key;
     }
 
