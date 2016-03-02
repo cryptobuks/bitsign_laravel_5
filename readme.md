@@ -28,21 +28,21 @@ Legally Valid signatures at a fraction of the cost
 
 ### Hashing ###
 
-Algorithm: sha256
-Provider: Complete Server Side
-Application: Reduce large data to a smaller representative string
+- Algorithm: sha256
+- Provider: Complete Server Side
+- Application: Reduce large data to a smaller representative string
 
 ### Asymmetric Encryption ###
 
-Algorithm: ECDSA-RSA
-Provider: Any Wallet
-Application: Proving ownership of a file by signing the hash
+- Algorithm: ECDSA-RSA
+- Provider: Any Wallet
+- Application: Proving ownership of a file by signing the hash
 
 ### Blockchain metadata store ###
 
-Algorithm: Abstracted to API
-Provider: Blockcypher
-Application: storing of certain strings on the blockchain
+- Algorithm: Abstracted to API
+- Provider: Blockcypher
+- Application: storing of certain strings on the blockchain
 
 ### Data Storage ###
 
@@ -50,4 +50,4 @@ Better abstract to a CDN or something like dropbox
 
 ### License ###
 
-(C) BitSign 2015 All rights reserved.
+(C) BitSign 2016 All rights reserved.
